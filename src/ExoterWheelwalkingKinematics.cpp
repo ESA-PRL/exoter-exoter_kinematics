@@ -1,0 +1,204 @@
+#include "ExoterWheelwalkingKinematics.hpp"
+
+#include "ExoterWheelwalkingTypes.hpp"
+
+#include <iostream>
+
+using namespace exoter;
+
+ExoterWheelwalkingKinematics::ExoterWheelwalkingKinematics(const unsigned int mode, const double step_length, const double wheel_radius) : ExoterLocomotionKinematics(wheel_radius, mode), step_length(step_length), state(FIRST_AXLE)
+{
+}
+
+ExoterWheelwalkingKinematics::~ExoterWheelwalkingKinematics()
+{
+}
+
+void ExoterWheelwalkingKinematics::computeConfigChangeJointCommands(const std::vector<double>& positions, const std::vector<double> &velocities,
+                                                                    std::vector<double>& position_commands, std::vector<double> &velocity_commands)
+{
+    std::vector<double> target_positions = getConfigChangeTargetJointPositions();
+
+    position_commands.resize(0);
+    position_commands.insert(position_commands.end(), target_positions.begin(), target_positions.end());
+    position_commands.insert(position_commands.end(), NUMBER_OF_WHEELS, std::numeric_limits<double>::quiet_NaN());
+
+    velocity_commands.resize(0);
+    velocity_commands.insert(velocity_commands.end(), NUMBER_OF_WALKING_WHEELS, std::numeric_limits<double>::quiet_NaN());
+    velocity_commands.insert(velocity_commands.end(), NUMBER_OF_STEERABLE_WHEELS, std::numeric_limits<double>::quiet_NaN());
+
+    for (int i = 0; i < NUMBER_OF_WHEELS; i++)
+    {
+        double walking_joint_velocity = velocities[NUMBER_OF_PASSIVE_JOINTS + i];
+        double walking_joint_position = positions[NUMBER_OF_PASSIVE_JOINTS + i];
+        velocity_commands.push_back(-(walking_joint_velocity * LEG_LENGTH / wheel_radius * cos(walking_joint_position) + walking_joint_velocity));
+    }
+}
+
+void ExoterWheelwalkingKinematics::computeMovementJointCommands(const double speed, const std::vector<double>& positions, const std::vector<double>& velocities,
+                                                                std::vector<double>& position_commands, std::vector<double>& velocity_commands)
+{
+    std::map<int,double> known_body_rates;
+
+    known_body_rates.insert(std::pair<int,double>(X_DOT, speed));
+    known_body_rates.insert(std::pair<int,double>(Y_DOT, 0.0d));
+    known_body_rates.insert(std::pair<int,double>(PHI_X_DOT, 0.0d));
+    known_body_rates.insert(std::pair<int,double>(PHI_Y_DOT, 0.0d));    // Removed temporarily because of immovable left rear walking joint.
+    known_body_rates.insert(std::pair<int,double>(PHI_Z_DOT, 0.0d));
+
+    std::map<int,double> known_joint_rates;
+
+    //known_joint_rates.insert(std::pair<int,double>(WALKING_RL, 0.0d));    // Added temporarily because of immovable left rear walking joint.
+
+    known_joint_rates.insert(std::pair<int,double>(ROLL_SLIP_FL, 0.0d)); known_joint_rates.insert(std::pair<int,double>(SIDE_SLIP_FL, 0.0d)); known_joint_rates.insert(std::pair<int,double>(TURN_SLIP_FL, 0.0d));
+    known_joint_rates.insert(std::pair<int,double>(ROLL_SLIP_FR, 0.0d)); known_joint_rates.insert(std::pair<int,double>(SIDE_SLIP_FR, 0.0d)); known_joint_rates.insert(std::pair<int,double>(TURN_SLIP_FR, 0.0d));
+    known_joint_rates.insert(std::pair<int,double>(ROLL_SLIP_ML, 0.0d)); known_joint_rates.insert(std::pair<int,double>(SIDE_SLIP_ML, 0.0d)); known_joint_rates.insert(std::pair<int,double>(TURN_SLIP_ML, 0.0d));
+    known_joint_rates.insert(std::pair<int,double>(ROLL_SLIP_MR, 0.0d)); known_joint_rates.insert(std::pair<int,double>(SIDE_SLIP_MR, 0.0d)); known_joint_rates.insert(std::pair<int,double>(TURN_SLIP_MR, 0.0d));
+    known_joint_rates.insert(std::pair<int,double>(ROLL_SLIP_RL, 0.0d)); known_joint_rates.insert(std::pair<int,double>(SIDE_SLIP_RL, 0.0d)); known_joint_rates.insert(std::pair<int,double>(TURN_SLIP_RL, 0.0d));
+    known_joint_rates.insert(std::pair<int,double>(ROLL_SLIP_RR, 0.0d)); known_joint_rates.insert(std::pair<int,double>(SIDE_SLIP_RR, 0.0d)); known_joint_rates.insert(std::pair<int,double>(TURN_SLIP_RR, 0.0d));
+
+    double rolling_rate;
+
+    switch (mode)
+    {
+    case AXLE_BY_AXLE:
+        rolling_rate = speed * 3 / wheel_radius;
+
+        switch (state)
+        {
+            case FIRST_AXLE:
+                step_distance += wheel_radius * (positions[ROLLING_FL] + positions[ROLLING_FR]) / 2;
+
+                known_joint_rates.insert(std::pair<int,double>(ROLLING_FL, rolling_rate)); known_joint_rates.insert(std::pair<int,double>(ROLLING_FR, rolling_rate));
+                known_joint_rates.insert(std::pair<int,double>(ROLLING_ML, 0.0d)); known_joint_rates.insert(std::pair<int,double>(ROLLING_MR, 0.0d));
+                known_joint_rates.insert(std::pair<int,double>(ROLLING_RR, 0.0d));   // known_joint_rates.insert(std::pair<int,double>(ROLLING_RL, rolling_rate)); // Removed temporarily because of immovable left rear walking joint.
+
+                break;
+            case SECOND_AXLE:
+                step_distance += wheel_radius * (positions[ROLLING_ML] + positions[ROLLING_MR]) / 2;
+
+                known_joint_rates.insert(std::pair<int,double>(ROLLING_FL, 0.0d)); known_joint_rates.insert(std::pair<int,double>(ROLLING_FR, 0.0d));
+                known_joint_rates.insert(std::pair<int,double>(ROLLING_ML, rolling_rate)); known_joint_rates.insert(std::pair<int,double>(ROLLING_MR, rolling_rate));
+                known_joint_rates.insert(std::pair<int,double>(ROLLING_RR, 0.0d));  // known_joint_rates.insert(std::pair<int,double>(ROLLING_RL, rolling_rate)); // Removed temporarily because of immovable left rear walking joint.
+
+                break;
+            case THIRD_AXLE:
+                step_distance += wheel_radius * (positions[ROLLING_RR]);    // positions[ROLLING_RL] + // Removed temporarily because of immovable left rear walking joint.
+
+                known_joint_rates.insert(std::pair<int,double>(ROLLING_FL, 0.0d)); known_joint_rates.insert(std::pair<int,double>(ROLLING_FR, 0.0d));
+                known_joint_rates.insert(std::pair<int,double>(ROLLING_ML, 0.0d)); known_joint_rates.insert(std::pair<int,double>(ROLLING_MR, 0.0d));
+                known_joint_rates.insert(std::pair<int,double>(ROLLING_RR, rolling_rate));  // known_joint_rates.insert(std::pair<int,double>(ROLLING_RL, rolling_rate)); // Removed temporarily because of immovable left rear walking joint.
+
+                break;
+        }
+
+        if (std::abs(step_distance) >= step_length)
+        {
+            state++;
+            state %= 3;
+            step_distance = 0;
+        }
+
+        break;
+    case SIDE_BY_SIDE:
+        rolling_rate = speed * 2 / wheel_radius;
+
+        switch (state)
+        {
+            case LEFT_SIDE:
+                step_distance += wheel_radius * (positions[ROLLING_FL] + positions[ROLLING_ML]) / 2;    // + positions[ROLLING_RL] // Removed temporarily because of immovable left rear walking joint.
+
+                known_joint_rates.insert(std::pair<int,double>(ROLLING_FL, rolling_rate)); known_joint_rates.insert(std::pair<int,double>(ROLLING_FR, 0.0d));
+                known_joint_rates.insert(std::pair<int,double>(ROLLING_ML, rolling_rate)); known_joint_rates.insert(std::pair<int,double>(ROLLING_MR, 0.0d));
+                known_joint_rates.insert(std::pair<int,double>(ROLLING_RR, 0.0d));    // known_joint_rates.insert(std::pair<int,double>(ROLLING_RL, rolling_rate)); // Removed temporarily because of immovable left rear walking joint.
+
+                break;
+            case RIGHT_SIDE:
+                step_distance += wheel_radius * (positions[ROLLING_FR] + positions[ROLLING_MR] + positions[ROLLING_RR]) / 3;
+
+                known_joint_rates.insert(std::pair<int,double>(ROLLING_FL, 0.0d)); known_joint_rates.insert(std::pair<int,double>(ROLLING_FR, rolling_rate));
+                known_joint_rates.insert(std::pair<int,double>(ROLLING_ML, 0.0d)); known_joint_rates.insert(std::pair<int,double>(ROLLING_MR, rolling_rate));
+                known_joint_rates.insert(std::pair<int,double>(ROLLING_RR, rolling_rate));  // known_joint_rates.insert(std::pair<int,double>(ROLLING_RL, 0.0d)); // Removed temporarily because of immovable left rear walking joint.
+
+                break;
+        }
+
+        if (std::abs(step_distance) >= step_length)
+        {
+            state++;
+            state %= 2;
+            step_distance = 0;
+        }
+
+        break;
+    case EVEN_ODD:
+        rolling_rate = speed * 2 / wheel_radius;
+
+        switch (state)
+        {
+            case LEFT_SIDE:
+                step_distance += wheel_radius * (positions[ROLLING_FL] + positions[ROLLING_MR]) / 2;    // + positions[ROLLING_RL] // Removed temporarily because of immovable left rear walking joint.
+
+                known_joint_rates.insert(std::pair<int,double>(ROLLING_FL, rolling_rate)); known_joint_rates.insert(std::pair<int,double>(ROLLING_FR, 0.0d));
+                known_joint_rates.insert(std::pair<int,double>(ROLLING_ML, 0.0d)); known_joint_rates.insert(std::pair<int,double>(ROLLING_MR, rolling_rate));
+                known_joint_rates.insert(std::pair<int,double>(ROLLING_RR, 0.0d));   // known_joint_rates.insert(std::pair<int,double>(ROLLING_RL, rolling_rate)); // Removed temporarily because of immovable left rear walking joint.
+
+                break;
+            case RIGHT_SIDE:
+                step_distance += wheel_radius * (positions[ROLLING_FR] + positions[ROLLING_ML] + positions[ROLLING_RR]) / 3;
+
+                known_joint_rates.insert(std::pair<int,double>(ROLLING_FL, 0.0d)); known_joint_rates.insert(std::pair<int,double>(ROLLING_FR, rolling_rate));
+                known_joint_rates.insert(std::pair<int,double>(ROLLING_ML, rolling_rate)); known_joint_rates.insert(std::pair<int,double>(ROLLING_MR, 0.0d));
+                known_joint_rates.insert(std::pair<int,double>(ROLLING_RR, rolling_rate));   // known_joint_rates.insert(std::pair<int,double>(ROLLING_RL, 0.0d)); // Removed temporarily because of immovable left rear walking joint.
+
+
+                break;
+        }
+
+        if (std::abs(step_distance) >= step_length)
+        {
+            state++;
+            state %= 2;
+            step_distance = 0;
+        }
+
+        break;
+    }
+
+    std::map<int,double> body_rates;
+    std::map<int,double> joint_rates;
+
+    kinematic_model->computeRates(positions, known_body_rates, known_joint_rates, body_rates, joint_rates);
+
+    position_commands.assign(NUMBER_OF_ACTIVE_JOINTS, std::numeric_limits<double>::quiet_NaN());
+
+    velocity_commands.resize(0);
+
+    velocity_commands.push_back(joint_rates.find(WALKING_FL)->second); velocity_commands.push_back(joint_rates.find(WALKING_FR)->second);
+    velocity_commands.push_back(joint_rates.find(WALKING_ML)->second); velocity_commands.push_back(joint_rates.find(WALKING_MR)->second);
+    velocity_commands.push_back(joint_rates.find(WALKING_RL)->second); velocity_commands.push_back(joint_rates.find(WALKING_RR)->second);
+
+    velocity_commands.push_back(joint_rates.find(STEERING_FL)->second); velocity_commands.push_back(joint_rates.find(STEERING_FR)->second);
+    velocity_commands.push_back(joint_rates.find(STEERING_RL)->second); velocity_commands.push_back(joint_rates.find(STEERING_RR)->second);
+
+    velocity_commands.push_back(joint_rates.find(ROLLING_FL)->second + joint_rates.find(CONTACT_FL)->second); velocity_commands.push_back(joint_rates.find(ROLLING_FR)->second + joint_rates.find(CONTACT_FR)->second);
+    velocity_commands.push_back(joint_rates.find(ROLLING_ML)->second + joint_rates.find(CONTACT_ML)->second); velocity_commands.push_back(joint_rates.find(ROLLING_MR)->second + joint_rates.find(CONTACT_MR)->second);
+    velocity_commands.push_back(joint_rates.find(ROLLING_RL)->second + joint_rates.find(CONTACT_RL)->second); velocity_commands.push_back(joint_rates.find(ROLLING_RR)->second + joint_rates.find(CONTACT_RR)->second);
+}
+
+std::vector<double> ExoterWheelwalkingKinematics::getConfigChangeTargetJointPositions()
+{
+    std::vector<double> joint_positions;    //Walking and steering joint positions
+
+    joint_positions.insert(joint_positions.end(), NUMBER_OF_WALKING_WHEELS, 0.0d);
+    joint_positions.insert(joint_positions.end(), NUMBER_OF_STEERABLE_WHEELS, 0.0d);
+
+    return joint_positions;
+}
+
+void ExoterWheelwalkingKinematics::setMode(unsigned int mode)
+{
+    this->mode = mode;
+    this->state = 0;
+    this->step_distance = 0;
+}

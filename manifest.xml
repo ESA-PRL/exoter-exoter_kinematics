@@ -1,0 +1,22 @@
+<package>
+  <description brief="ExoTer kinematics library">
+  This module should include all ExoTer kinematics dedicated classes
+  </description>
+  <author>Tim Wiese/tim.wiese@esa.int</author>
+  <author>Javier Hidalgo Carrio/javier.hidalgo-carrio@dfki.de</author>
+  <license>GPL-v2 or later</license>
+  <url>http://rock-robotics.org</url>
+  <logo>http://</logo>
+  <depend package="base/cmake" />
+  <!--
+   To add any dependencies use the depend tag
+  <depend package="dummy-dependency-0" />
+	...
+  <depend package="dummy-dependency-n-1" />
+  <depend package="dummy-dependency-n" />
+  -->
+  <depend package="base/types" />
+  <depend package="slam/odometry" />
+  <depend package="control/kdl_parser" />
+
+</package>

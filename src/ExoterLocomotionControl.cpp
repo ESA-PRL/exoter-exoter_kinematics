@@ -1,0 +1,110 @@
+#include "ExoterLocomotionControl.hpp"
+#include <iostream>
+
+using namespace exoter;
+
+ExoterLocomotionControl::ExoterLocomotionControl(unsigned int mode) : current_mode(mode), mode_transition(true), speed(0.0d)
+{
+    positions.assign(EXOTER_JOINT_DOF, 0.0d);
+    velocities.assign(EXOTER_JOINT_DOF, 0.0d);
+    position_readings_old.assign(NUMBER_OF_PASSIVE_JOINTS + NUMBER_OF_ACTIVE_JOINTS, 0.0d);
+    velocity_readings_old.assign(NUMBER_OF_PASSIVE_JOINTS + NUMBER_OF_ACTIVE_JOINTS, 0.0d);
+}
+
+ExoterLocomotionControl::~ExoterLocomotionControl()
+{
+}
+
+void ExoterLocomotionControl::getJointCommands(std::vector<double>& position_commands, std::vector<double>& velocity_commands)
+{
+    if (mode_transition)
+    {
+        if (checkTargetJointPositionsReached())
+        {
+            mode_transition = false;
+            std::cout << "Transition complete. Commence driving." << std::endl;
+        }
+        else
+        {
+            kinematics->computeConfigChangeJointCommands(positions, velocities, position_commands, velocity_commands);
+            return;
+        }
+    }
+
+    kinematics->computeMovementJointCommands(speed, positions, velocities, position_commands, velocity_commands);
+}
+
+void ExoterLocomotionControl::setNewJointReadings(const std::vector<double>& position_readings, const std::vector<double>& velocity_readings)
+{
+    positions = assemblePositionVector(position_readings);
+    velocities = assembleVelocityVector(velocity_readings);
+    position_readings_old = position_readings;
+    velocity_readings_old = velocity_readings;
+}
+
+void ExoterLocomotionControl::setSpeed(const double speed) // Input between -1 and 1.
+{
+    this->speed = speed;
+}
+
+void ExoterLocomotionControl::selectMode(const unsigned int mode)
+{
+    current_mode = mode;
+    kinematics->setMode(mode);
+    mode_transition = true;
+    std::cout << "Transitioning to initial configuration..." << std::endl;
+}
+
+bool ExoterLocomotionControl::checkTargetJointPositionsReached()
+{
+    std::vector<double> joint_positions(positions.begin() + NUMBER_OF_PASSIVE_JOINTS, positions.begin() + NUMBER_OF_PASSIVE_JOINTS + NUMBER_OF_WALKING_WHEELS + NUMBER_OF_STEERABLE_WHEELS);
+    std::vector<double> target_joint_positions = kinematics->getConfigChangeTargetJointPositions();
+
+    for (unsigned int i = 0; i < joint_positions.size(); i++)
+    {
+        if (std::abs(joint_positions[i] - target_joint_positions[i]) > MAX_POS_OFFSET && i != 4)
+            return false;
+    }
+
+    return true;
+}
+
+std::vector<double> ExoterLocomotionControl::assemblePositionVector(const std::vector<double> position_readings)
+{
+    std::vector<double> positions;
+
+    positions.insert(positions.end(), position_readings.begin(), position_readings.begin() + NUMBER_OF_PASSIVE_JOINTS + NUMBER_OF_WALKING_WHEELS - 1);
+//    positions.push_back(0.0d);  // Added temporarily for immovable left rear walking joint.
+    positions.insert(positions.end(), position_readings.begin() + NUMBER_OF_PASSIVE_JOINTS + NUMBER_OF_WALKING_WHEELS - 1, position_readings.begin() + NUMBER_OF_PASSIVE_JOINTS + NUMBER_OF_WALKING_WHEELS + NUMBER_OF_STEERABLE_WHEELS);
+
+    // Rolling angles as difference between new and old value
+    for (int i = 0; i < NUMBER_OF_WHEELS; i++)
+        positions.push_back(position_readings[NUMBER_OF_PASSIVE_JOINTS + NUMBER_OF_WALKING_WHEELS + NUMBER_OF_STEERABLE_WHEELS + i] - position_readings_old[NUMBER_OF_PASSIVE_JOINTS + NUMBER_OF_WALKING_WHEELS + NUMBER_OF_STEERABLE_WHEELS + i]);
+
+    // Slip currently assumed as zero
+    positions.insert(positions.end(), NUMBER_OF_WHEELS * SLIP_VECTOR_SIZE, 0.0d);
+
+    // Contact angles - currently assumed so that ground is parallel to rover base plate
+    for (int i = 0; i < NUMBER_OF_WHEELS; i++)
+        positions.push_back(-position_readings[NUMBER_OF_PASSIVE_JOINTS + i]);  // Contact angle set to the negative wheel walking angle
+
+    return positions;
+}
+
+std::vector<double> ExoterLocomotionControl::assembleVelocityVector(const std::vector<double> velocity_readings)
+{
+    std::vector<double> velocities;
+
+    velocities.insert(velocities.end(), velocity_readings.begin(), velocity_readings.begin() + NUMBER_OF_PASSIVE_JOINTS + NUMBER_OF_WALKING_WHEELS - 1);
+//    velocities.push_back(0.0d);  // Added temporarily for immovable left rear walking joint.
+    velocities.insert(velocities.end(), velocity_readings.begin() + NUMBER_OF_PASSIVE_JOINTS + NUMBER_OF_WALKING_WHEELS - 1, velocity_readings.begin() + NUMBER_OF_PASSIVE_JOINTS + NUMBER_OF_ACTIVE_JOINTS);
+
+    // Slip rates currently assumed as zero
+    velocities.insert(velocities.end(), NUMBER_OF_WHEELS * SLIP_VECTOR_SIZE, 0.0d);
+
+    // Contact angle velocities - currently assumed so that ground stays parallel to rover base plate
+    for (int i = 0; i < NUMBER_OF_WHEELS; i++)
+        velocities.push_back(-velocity_readings[NUMBER_OF_PASSIVE_JOINTS + i]);  // Contact angle rate set to the negative wheel walking joint rate
+
+    return velocities;
+}
