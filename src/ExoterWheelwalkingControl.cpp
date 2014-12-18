@@ -8,7 +8,7 @@ using namespace exoter;
 
 ExoterWheelwalkingControl::ExoterWheelwalkingControl(const double wheel_radius) : ExoterLocomotionControl(static_cast<unsigned int>(AXLE_BY_AXLE))
 {
-    kinematics = new ExoterWheelwalkingKinematics(AXLE_BY_AXLE, 0.05, wheel_radius);
+    kinematics = new ExoterWheelwalkingKinematics(AXLE_BY_AXLE, 0.05, 0.00, wheel_radius);
 }
 
 ExoterWheelwalkingControl::~ExoterWheelwalkingControl()
@@ -16,7 +16,8 @@ ExoterWheelwalkingControl::~ExoterWheelwalkingControl()
     delete kinematics;
 }
 
-void ExoterWheelwalkingControl::selectNextGait() {
+void ExoterWheelwalkingControl::selectNextGait()
+{
     switch(current_mode)
     {
     case AXLE_BY_AXLE:
