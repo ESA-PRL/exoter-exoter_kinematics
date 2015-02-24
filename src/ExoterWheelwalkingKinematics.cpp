@@ -171,6 +171,69 @@ void ExoterWheelwalkingKinematics::computeMovementJointCommands(const double ww_
         }
 
         break;
+	case SINGLE_WHEEL:
+        ww_rolling_rate = ww_speed * 6 / wheel_radius;
+
+        switch (state)
+        {
+            case FRONT_LEFT:
+                step_distance += wheel_radius * positions[ROLLING_FL];
+
+                known_joint_rates.insert(std::pair<int,double>(ROLLING_FL, ww_rolling_rate + offset_rolling_rate)); known_joint_rates.insert(std::pair<int,double>(ROLLING_FR, offset_rolling_rate));
+                known_joint_rates.insert(std::pair<int,double>(ROLLING_ML, offset_rolling_rate)); known_joint_rates.insert(std::pair<int,double>(ROLLING_MR, offset_rolling_rate));
+                known_joint_rates.insert(std::pair<int,double>(ROLLING_RL, offset_rolling_rate)); known_joint_rates.insert(std::pair<int,double>(ROLLING_RR, offset_rolling_rate));
+
+                break;
+			case FRONT_RIGHT:
+                step_distance += wheel_radius * positions[ROLLING_FR];
+
+                known_joint_rates.insert(std::pair<int,double>(ROLLING_FL, offset_rolling_rate)); known_joint_rates.insert(std::pair<int,double>(ROLLING_FR, ww_rolling_rate + offset_rolling_rate));
+                known_joint_rates.insert(std::pair<int,double>(ROLLING_ML, offset_rolling_rate)); known_joint_rates.insert(std::pair<int,double>(ROLLING_MR, offset_rolling_rate));
+                known_joint_rates.insert(std::pair<int,double>(ROLLING_RL, offset_rolling_rate)); known_joint_rates.insert(std::pair<int,double>(ROLLING_RR, offset_rolling_rate));
+
+				break;
+            case MIDDLE_LEFT:
+                step_distance += wheel_radius * positions[ROLLING_ML];
+
+                known_joint_rates.insert(std::pair<int,double>(ROLLING_FL, offset_rolling_rate)); known_joint_rates.insert(std::pair<int,double>(ROLLING_FR, offset_rolling_rate));
+                known_joint_rates.insert(std::pair<int,double>(ROLLING_ML, ww_rolling_rate + offset_rolling_rate)); known_joint_rates.insert(std::pair<int,double>(ROLLING_MR, offset_rolling_rate));
+                known_joint_rates.insert(std::pair<int,double>(ROLLING_RL, offset_rolling_rate)); known_joint_rates.insert(std::pair<int,double>(ROLLING_RR, offset_rolling_rate));
+
+                break;
+			case MIDDLE_RIGHT:
+                step_distance += wheel_radius * positions[ROLLING_MR];
+
+                known_joint_rates.insert(std::pair<int,double>(ROLLING_FL, offset_rolling_rate)); known_joint_rates.insert(std::pair<int,double>(ROLLING_FR, offset_rolling_rate));
+                known_joint_rates.insert(std::pair<int,double>(ROLLING_ML, offset_rolling_rate)); known_joint_rates.insert(std::pair<int,double>(ROLLING_MR, ww_rolling_rate + offset_rolling_rate));
+                known_joint_rates.insert(std::pair<int,double>(ROLLING_RL, offset_rolling_rate)); known_joint_rates.insert(std::pair<int,double>(ROLLING_RR, offset_rolling_rate));
+
+                break;
+            case REAR_LEFT:
+                step_distance += wheel_radius * positions[ROLLING_RL];
+
+                known_joint_rates.insert(std::pair<int,double>(ROLLING_FL, offset_rolling_rate)); known_joint_rates.insert(std::pair<int,double>(ROLLING_FR, offset_rolling_rate));
+                known_joint_rates.insert(std::pair<int,double>(ROLLING_ML, offset_rolling_rate)); known_joint_rates.insert(std::pair<int,double>(ROLLING_MR, offset_rolling_rate));
+                known_joint_rates.insert(std::pair<int,double>(ROLLING_RL, ww_rolling_rate + offset_rolling_rate)); known_joint_rates.insert(std::pair<int,double>(ROLLING_RR, offset_rolling_rate));
+
+                break;
+			case REAR_RIGHT:
+                step_distance += wheel_radius * positions[ROLLING_RR];
+
+                known_joint_rates.insert(std::pair<int,double>(ROLLING_FL, offset_rolling_rate)); known_joint_rates.insert(std::pair<int,double>(ROLLING_FR, offset_rolling_rate));
+                known_joint_rates.insert(std::pair<int,double>(ROLLING_ML, offset_rolling_rate)); known_joint_rates.insert(std::pair<int,double>(ROLLING_MR, offset_rolling_rate));
+                known_joint_rates.insert(std::pair<int,double>(ROLLING_RL, offset_rolling_rate)); known_joint_rates.insert(std::pair<int,double>(ROLLING_RR, ww_rolling_rate + offset_rolling_rate));
+
+			break;
+        }
+
+        if (std::abs(step_distance) >= step_length)
+        {
+            state++;
+            state %= 6;
+            step_distance = 0;
+        }
+
+        break;
     }
 
     std::map<int,double> body_rates;
