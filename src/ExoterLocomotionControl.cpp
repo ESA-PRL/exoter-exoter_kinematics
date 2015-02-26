@@ -77,9 +77,10 @@ std::vector<double> ExoterLocomotionControl::assemblePositionVector(const std::v
 //    positions.push_back(0.0d);  // Added temporarily for immovable left rear walking joint.
     positions.insert(positions.end(), position_readings.begin() + NUMBER_OF_PASSIVE_JOINTS + NUMBER_OF_WALKING_WHEELS - 1, position_readings.begin() + NUMBER_OF_PASSIVE_JOINTS + NUMBER_OF_WALKING_WHEELS + NUMBER_OF_STEERABLE_WHEELS);
 
-    // Rolling angles as difference between new and old value
+    // Rolling angles as difference between new and old driving joint position minus change of ground contact angle (~= change of wheel walking angle)
     for (int i = 0; i < NUMBER_OF_WHEELS; i++)
-        positions.push_back(position_readings[NUMBER_OF_PASSIVE_JOINTS + NUMBER_OF_WALKING_WHEELS + NUMBER_OF_STEERABLE_WHEELS + i] - position_readings_old[NUMBER_OF_PASSIVE_JOINTS + NUMBER_OF_WALKING_WHEELS + NUMBER_OF_STEERABLE_WHEELS + i]);
+        positions.push_back(position_readings[NUMBER_OF_PASSIVE_JOINTS + NUMBER_OF_WALKING_WHEELS + NUMBER_OF_STEERABLE_WHEELS + i] - position_readings_old[NUMBER_OF_PASSIVE_JOINTS + NUMBER_OF_WALKING_WHEELS + NUMBER_OF_STEERABLE_WHEELS + i]
+        - (position_readings[NUMBER_OF_PASSIVE_JOINTS + i] - position_readings_old[NUMBER_OF_PASSIVE_JOINTS + i]));
 
     // Slip currently assumed as zero
     positions.insert(positions.end(), NUMBER_OF_WHEELS * SLIP_VECTOR_SIZE, 0.0d);
@@ -97,7 +98,11 @@ std::vector<double> ExoterLocomotionControl::assembleVelocityVector(const std::v
 
     velocities.insert(velocities.end(), velocity_readings.begin(), velocity_readings.begin() + NUMBER_OF_PASSIVE_JOINTS + NUMBER_OF_WALKING_WHEELS - 1);
 //    velocities.push_back(0.0d);  // Added temporarily for immovable left rear walking joint.
-    velocities.insert(velocities.end(), velocity_readings.begin() + NUMBER_OF_PASSIVE_JOINTS + NUMBER_OF_WALKING_WHEELS - 1, velocity_readings.begin() + NUMBER_OF_PASSIVE_JOINTS + NUMBER_OF_ACTIVE_JOINTS);
+    velocities.insert(velocities.end(), velocity_readings.begin() + NUMBER_OF_PASSIVE_JOINTS + NUMBER_OF_WALKING_WHEELS - 1, velocity_readings.begin() + NUMBER_OF_PASSIVE_JOINTS + NUMBER_OF_WALKING_WHEELS + NUMBER_OF_STEERABLE_WHEELS);
+    
+    // Rolling rates as difference between driving joint rates and contact angle rates (~= wheel walking joint rate)
+    for (int i = 0; i < NUMBER_OF_WHEELS; i++)
+        velocities.push_back(velocity_readings[NUMBER_OF_PASSIVE_JOINTS + NUMBER_OF_WALKING_WHEELS + NUMBER_OF_STEERABLE_WHEELS + i] - velocity_readings[NUMBER_OF_PASSIVE_JOINTS + i]);
 
     // Slip rates currently assumed as zero
     velocities.insert(velocities.end(), NUMBER_OF_WHEELS * SLIP_VECTOR_SIZE, 0.0d);
