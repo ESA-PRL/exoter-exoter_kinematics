@@ -58,7 +58,7 @@ void ExoterWheelwalkingKinematics::computeMovementJointCommands(const double ww_
     known_joint_rates.insert(std::pair<int,double>(ROLL_SLIP_RR, 0.0d)); known_joint_rates.insert(std::pair<int,double>(SIDE_SLIP_RR, 0.0d)); known_joint_rates.insert(std::pair<int,double>(TURN_SLIP_RR, 0.0d));
 
     double ww_rolling_rate;
-	double offset_rolling_rate = offset_speed / wheel_radius;
+    double offset_rolling_rate = offset_speed / wheel_radius;
 
     switch (mode)
     {
@@ -96,11 +96,18 @@ void ExoterWheelwalkingKinematics::computeMovementJointCommands(const double ww_
                 break;
         }
 
-        if (std::abs(step_distance) >= step_length)
+        if (ww_speed > 0 && step_distance >= step_length || ww_speed < 0 && step_distance <= 0)
         {
-            state++;
-            state %= 3;
-            step_distance = 0;
+            if (ww_speed > 0)
+            {
+                ++state %= 3;
+                step_distance = 0;
+            }
+            else
+            {
+                state = (state == 0) ? 2 : state - 1;
+                step_distance = step_length;
+            }
         }
 
         break;
@@ -129,11 +136,11 @@ void ExoterWheelwalkingKinematics::computeMovementJointCommands(const double ww_
                 break;
         }
 
-        if (std::abs(step_distance) >= step_length)
+        if (ww_speed > 0 && step_distance >= step_length / 2 || ww_speed < 0 && step_distance <= -step_length / 2)
         {
             state++;
             state %= 2;
-            step_distance = 0;
+            step_distance = (ww_speed > 0) ? -step_length / 2 : step_length / 2;
         }
 
         break;
@@ -163,15 +170,15 @@ void ExoterWheelwalkingKinematics::computeMovementJointCommands(const double ww_
                 break;
         }
 
-        if (std::abs(step_distance) >= step_length)
+        if (ww_speed > 0 && step_distance >= step_length / 2 || ww_speed < 0 && step_distance <= -step_length / 2)
         {
             state++;
             state %= 2;
-            step_distance = 0;
+            step_distance = (ww_speed > 0) ? -step_length / 2 : step_length / 2;
         }
 
         break;
-	case SINGLE_WHEEL:
+    case SINGLE_WHEEL:
         ww_rolling_rate = ww_speed * 6 / wheel_radius;
 
         switch (state)
@@ -184,14 +191,14 @@ void ExoterWheelwalkingKinematics::computeMovementJointCommands(const double ww_
                 known_joint_rates.insert(std::pair<int,double>(ROLLING_RL, offset_rolling_rate)); known_joint_rates.insert(std::pair<int,double>(ROLLING_RR, offset_rolling_rate));
 
                 break;
-			case FRONT_RIGHT:
+	    case FRONT_RIGHT:
                 step_distance += wheel_radius * positions[ROLLING_FR];
 
                 known_joint_rates.insert(std::pair<int,double>(ROLLING_FL, offset_rolling_rate)); known_joint_rates.insert(std::pair<int,double>(ROLLING_FR, ww_rolling_rate + offset_rolling_rate));
                 known_joint_rates.insert(std::pair<int,double>(ROLLING_ML, offset_rolling_rate)); known_joint_rates.insert(std::pair<int,double>(ROLLING_MR, offset_rolling_rate));
                 known_joint_rates.insert(std::pair<int,double>(ROLLING_RL, offset_rolling_rate)); known_joint_rates.insert(std::pair<int,double>(ROLLING_RR, offset_rolling_rate));
 
-				break;
+		break;
             case MIDDLE_LEFT:
                 step_distance += wheel_radius * positions[ROLLING_ML];
 
@@ -200,7 +207,7 @@ void ExoterWheelwalkingKinematics::computeMovementJointCommands(const double ww_
                 known_joint_rates.insert(std::pair<int,double>(ROLLING_RL, offset_rolling_rate)); known_joint_rates.insert(std::pair<int,double>(ROLLING_RR, offset_rolling_rate));
 
                 break;
-			case MIDDLE_RIGHT:
+	    case MIDDLE_RIGHT:
                 step_distance += wheel_radius * positions[ROLLING_MR];
 
                 known_joint_rates.insert(std::pair<int,double>(ROLLING_FL, offset_rolling_rate)); known_joint_rates.insert(std::pair<int,double>(ROLLING_FR, offset_rolling_rate));
@@ -216,21 +223,28 @@ void ExoterWheelwalkingKinematics::computeMovementJointCommands(const double ww_
                 known_joint_rates.insert(std::pair<int,double>(ROLLING_RL, ww_rolling_rate + offset_rolling_rate)); known_joint_rates.insert(std::pair<int,double>(ROLLING_RR, offset_rolling_rate));
 
                 break;
-			case REAR_RIGHT:
+	    case REAR_RIGHT:
                 step_distance += wheel_radius * positions[ROLLING_RR];
 
                 known_joint_rates.insert(std::pair<int,double>(ROLLING_FL, offset_rolling_rate)); known_joint_rates.insert(std::pair<int,double>(ROLLING_FR, offset_rolling_rate));
                 known_joint_rates.insert(std::pair<int,double>(ROLLING_ML, offset_rolling_rate)); known_joint_rates.insert(std::pair<int,double>(ROLLING_MR, offset_rolling_rate));
                 known_joint_rates.insert(std::pair<int,double>(ROLLING_RL, offset_rolling_rate)); known_joint_rates.insert(std::pair<int,double>(ROLLING_RR, ww_rolling_rate + offset_rolling_rate));
 
-			break;
+	        break;
         }
 
-        if (std::abs(step_distance) >= step_length)
+        if (ww_speed > 0 && step_distance >= step_length || ww_speed < 0 && step_distance <= 0)
         {
-            state++;
-            state %= 6;
-            step_distance = 0;
+            if (ww_speed > 0)
+            {
+                ++state %= 6;
+                step_distance = 0;
+            }
+            else
+            {
+                state = (state == 0) ? 5 : state - 1;
+                step_distance = step_length;
+            }
         }
 
         break;
@@ -280,7 +294,7 @@ void ExoterWheelwalkingKinematics::setMode(unsigned int mode)
             break;
         case SIDE_BY_SIDE:
         case EVEN_ODD:
-            this->step_distance = this->step_length / 2;
+            this->step_distance = 0;//this->step_length / 2;
             break;
     }
 }
