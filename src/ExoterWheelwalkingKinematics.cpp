@@ -275,6 +275,7 @@ void ExoterWheelwalkingKinematics::setMode(unsigned int mode)
     switch (mode)
     {
         case AXLE_BY_AXLE:
+        case SINGLE_WHEEL:
             this->step_distance = 0;
             break;
         case SIDE_BY_SIDE:
