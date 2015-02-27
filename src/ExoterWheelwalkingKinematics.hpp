@@ -18,7 +18,7 @@ namespace exoter
     class ExoterWheelwalkingKinematics : public ExoterLocomotionKinematics
     {
     public:
-        ExoterWheelwalkingKinematics(const unsigned int mode, const double step_length, const double offset_speed, const double wheel_radius);
+        ExoterWheelwalkingKinematics(const unsigned int mode, const double wheel_radius);
         ~ExoterWheelwalkingKinematics();
 
         void computeConfigChangeJointCommands(const std::vector<double>& positions, const std::vector<double> &velocities,
@@ -27,9 +27,11 @@ namespace exoter
                                           std::vector<double>& position_commands, std::vector<double>& velocity_commands);
         std::vector<double> getConfigChangeTargetJointPositions();
         void setMode(unsigned int mode);
+        void setOffsetSpeed(const double offset_speed);
+        void setStepLength(const double step_length);
     private:
-        const double step_length;
-        const double offset_speed;
+        double step_length;
+        double offset_speed;
         unsigned int state;
         double step_distance;
     };

@@ -42,7 +42,7 @@ void ExoterLocomotionControl::setNewJointReadings(const std::vector<double>& pos
     velocity_readings_old = velocity_readings;
 }
 
-void ExoterLocomotionControl::setSpeed(const double speed) // Input between -1 and 1.
+void ExoterLocomotionControl::setSpeed(const double speed)
 {
     this->speed = speed;
 }
@@ -80,7 +80,7 @@ std::vector<double> ExoterLocomotionControl::assemblePositionVector(const std::v
     // Rolling angles as difference between new and old driving joint position minus change of ground contact angle (~= change of wheel walking angle)
     for (int i = 0; i < NUMBER_OF_WHEELS; i++)
         positions.push_back(position_readings[NUMBER_OF_PASSIVE_JOINTS + NUMBER_OF_WALKING_WHEELS + NUMBER_OF_STEERABLE_WHEELS + i] - position_readings_old[NUMBER_OF_PASSIVE_JOINTS + NUMBER_OF_WALKING_WHEELS + NUMBER_OF_STEERABLE_WHEELS + i]
-        - (position_readings[NUMBER_OF_PASSIVE_JOINTS + i] - position_readings_old[NUMBER_OF_PASSIVE_JOINTS + i]));
+        + position_readings[NUMBER_OF_PASSIVE_JOINTS + i] - position_readings_old[NUMBER_OF_PASSIVE_JOINTS + i]);
 
     // Slip currently assumed as zero
     positions.insert(positions.end(), NUMBER_OF_WHEELS * SLIP_VECTOR_SIZE, 0.0d);
@@ -102,7 +102,7 @@ std::vector<double> ExoterLocomotionControl::assembleVelocityVector(const std::v
     
     // Rolling rates as difference between driving joint rates and contact angle rates (~= wheel walking joint rate)
     for (int i = 0; i < NUMBER_OF_WHEELS; i++)
-        velocities.push_back(velocity_readings[NUMBER_OF_PASSIVE_JOINTS + NUMBER_OF_WALKING_WHEELS + NUMBER_OF_STEERABLE_WHEELS + i] - velocity_readings[NUMBER_OF_PASSIVE_JOINTS + i]);
+        velocities.push_back(velocity_readings[NUMBER_OF_PASSIVE_JOINTS + NUMBER_OF_WALKING_WHEELS + NUMBER_OF_STEERABLE_WHEELS + i] + velocity_readings[NUMBER_OF_PASSIVE_JOINTS + i]);
 
     // Slip rates currently assumed as zero
     velocities.insert(velocities.end(), NUMBER_OF_WHEELS * SLIP_VECTOR_SIZE, 0.0d);

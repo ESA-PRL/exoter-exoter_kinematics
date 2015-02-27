@@ -6,12 +6,22 @@
 
 using namespace exoter;
 
-ExoterWheelwalkingKinematics::ExoterWheelwalkingKinematics(const unsigned int mode, const double step_length, const double offset_speed, const double wheel_radius) : ExoterLocomotionKinematics(wheel_radius, mode), step_length(step_length), offset_speed(offset_speed), state(FIRST_AXLE)
+ExoterWheelwalkingKinematics::ExoterWheelwalkingKinematics(const unsigned int mode, const double wheel_radius) : ExoterLocomotionKinematics(wheel_radius, mode), step_length(0.02d), offset_speed(0.0d), state(0)
 {
 }
 
 ExoterWheelwalkingKinematics::~ExoterWheelwalkingKinematics()
 {
+}
+
+void ExoterWheelwalkingKinematics::setOffsetSpeed(const double offset_speed)
+{
+    this->offset_speed = offset_speed;
+}
+
+void ExoterWheelwalkingKinematics::setStepLength(const double step_length)
+{
+    this->step_length = step_length;
 }
 
 void ExoterWheelwalkingKinematics::computeConfigChangeJointCommands(const std::vector<double>& positions, const std::vector<double> &velocities,
@@ -96,7 +106,7 @@ void ExoterWheelwalkingKinematics::computeMovementJointCommands(const double ww_
                 break;
         }
 
-        if (ww_speed > 0 && step_distance >= step_length || ww_speed < 0 && step_distance <= 0)
+        if ((ww_speed > 0 && step_distance >= step_length) || (ww_speed < 0 && step_distance <= 0))
         {
             if (ww_speed > 0)
             {
@@ -136,7 +146,7 @@ void ExoterWheelwalkingKinematics::computeMovementJointCommands(const double ww_
                 break;
         }
 
-        if (ww_speed > 0 && step_distance >= step_length / 2 || ww_speed < 0 && step_distance <= -step_length / 2)
+        if ((ww_speed > 0 && step_distance >= step_length / 2) || (ww_speed < 0 && step_distance <= -step_length / 2))
         {
             state++;
             state %= 2;
@@ -170,7 +180,7 @@ void ExoterWheelwalkingKinematics::computeMovementJointCommands(const double ww_
                 break;
         }
 
-        if (ww_speed > 0 && step_distance >= step_length / 2 || ww_speed < 0 && step_distance <= -step_length / 2)
+        if ((ww_speed > 0 && step_distance >= step_length / 2) || (ww_speed < 0 && step_distance <= -step_length / 2))
         {
             state++;
             state %= 2;
@@ -233,7 +243,7 @@ void ExoterWheelwalkingKinematics::computeMovementJointCommands(const double ww_
 	        break;
         }
 
-        if (ww_speed > 0 && step_distance >= step_length || ww_speed < 0 && step_distance <= 0)
+        if ((ww_speed > 0 && step_distance >= step_length) || (ww_speed < 0 && step_distance <= 0))
         {
             if (ww_speed > 0)
             {

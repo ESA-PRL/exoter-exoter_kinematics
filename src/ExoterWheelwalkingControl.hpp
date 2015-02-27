@@ -21,6 +21,8 @@ namespace exoter
         ExoterWheelwalkingControl(const double wheel_radius);
         ~ExoterWheelwalkingControl();
         void selectNextGait();
+        void setOffsetSpeed(const double offset_speed);
+        void setStepLength(const double step_length);
     private:
         std::vector<double> getTargetJointPositions();
     };
