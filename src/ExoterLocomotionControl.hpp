@@ -21,6 +21,9 @@ namespace exoter
         void setNewJointReadings(const std::vector<double>& position_readings, const std::vector<double>& velocity_readings);
         void selectMode(const unsigned int mode);
         void setSpeed(const double speed);
+	void stopMotion();
+	void startMotion();
+	void initJointConfiguration();
     protected:
         ExoterLocomotionControl(unsigned int mode);
         ~ExoterLocomotionControl();
@@ -28,6 +31,7 @@ namespace exoter
         ExoterLocomotionKinematics* kinematics;
         int current_mode;
         bool mode_transition;
+	bool stop_motion;
         double speed;
         std::vector<double> positions;
         std::vector<double> velocities;

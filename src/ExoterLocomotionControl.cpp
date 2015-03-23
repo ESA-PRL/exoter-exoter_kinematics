@@ -3,7 +3,7 @@
 
 using namespace exoter;
 
-ExoterLocomotionControl::ExoterLocomotionControl(unsigned int mode) : current_mode(mode), mode_transition(true), speed(0.0d)
+ExoterLocomotionControl::ExoterLocomotionControl(unsigned int mode) : current_mode(mode), mode_transition(true), stop_motion(false), speed(0.0d)
 {
     positions.assign(EXOTER_JOINT_DOF, 0.0d);
     velocities.assign(EXOTER_JOINT_DOF, 0.0d);
@@ -31,7 +31,15 @@ void ExoterLocomotionControl::getJointCommands(std::vector<double>& position_com
         }
     }
 
-    kinematics->computeMovementJointCommands(speed, positions, velocities, position_commands, velocity_commands);
+	if (stop_motion)
+	{
+        position_commands.assign(NUMBER_OF_ACTIVE_JOINTS, std::numeric_limits<double>::quiet_NaN());
+        velocity_commands.assign(NUMBER_OF_ACTIVE_JOINTS, 0.0d);
+	}
+	else
+	{
+	    kinematics->computeMovementJointCommands(speed, positions, velocities, position_commands, velocity_commands);
+	}
 }
 
 void ExoterLocomotionControl::setNewJointReadings(const std::vector<double>& position_readings, const std::vector<double>& velocity_readings)
@@ -47,12 +55,28 @@ void ExoterLocomotionControl::setSpeed(const double speed)
     this->speed = speed;
 }
 
+void ExoterLocomotionControl::stopMotion()
+{
+	stop_motion = true;
+}
+
+void ExoterLocomotionControl::startMotion()
+{
+	stop_motion = false;
+}
+
+void ExoterLocomotionControl::initJointConfiguration()
+{
+    mode_transition = true;
+    std::cout << "Transitioning to initial configuration..." << std::endl;	
+}
+
 void ExoterLocomotionControl::selectMode(const unsigned int mode)
 {
     current_mode = mode;
     kinematics->setMode(mode);
-    mode_transition = true;
-    std::cout << "Transitioning to initial configuration..." << std::endl;
+
+	initJointConfiguration();
 }
 
 bool ExoterLocomotionControl::checkTargetJointPositionsReached()

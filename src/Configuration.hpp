@@ -45,6 +45,8 @@ namespace exoter
                       ROLL_SLIP_RL, SIDE_SLIP_RL, TURN_SLIP_RL,
                       ROLL_SLIP_RR, SIDE_SLIP_RR, TURN_SLIP_RR,
                       CONTACT_FL, CONTACT_FR, CONTACT_ML, CONTACT_MR, CONTACT_RL, CONTACT_RR};
+
+    static const double MAX_POS_OFFSET = 0.001d;
 }
 
 #endif

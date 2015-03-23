@@ -14,13 +14,11 @@
 
 namespace exoter
 {
-    const double MAX_POS_OFFSET = 0.001d;
-
     class ExoterLocomotionKinematics
     {
     public:
         ExoterLocomotionKinematics(const double wheel_radius, const unsigned int mode);
-        ~ExoterLocomotionKinematics();
+        virtual ~ExoterLocomotionKinematics();
 
         virtual void setMode(const unsigned int mode);
         virtual void computeConfigChangeJointCommands(const std::vector<double>& positions, const std::vector<double> &velocities,
