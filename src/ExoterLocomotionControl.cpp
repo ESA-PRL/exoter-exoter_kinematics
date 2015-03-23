@@ -62,7 +62,7 @@ bool ExoterLocomotionControl::checkTargetJointPositionsReached()
 
     for (unsigned int i = 0; i < joint_positions.size(); i++)
     {
-        if (std::abs(joint_positions[i] - target_joint_positions[i]) > MAX_POS_OFFSET && i != 4)
+        if (std::abs(joint_positions[i] - target_joint_positions[i]) > MAX_POS_OFFSET)
             return false;
     }
 
