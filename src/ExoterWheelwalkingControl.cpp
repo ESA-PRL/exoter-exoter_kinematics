@@ -34,6 +34,9 @@ void ExoterWheelwalkingControl::selectMode(const unsigned int mode)
     case SINGLE_WHEEL:
         std::cout << "Switching to SINGLE_WHEEL gait." << std::endl;
 	break;
+    case NORMAL_DRIVING:
+        std::cout << "Switching to NORMAL_DRIVING gait." << std::endl;
+	break;
     default:
 	std::cout << "Invalid gait selected." << std::endl;
 	valid_gait = false;
@@ -63,6 +66,9 @@ void ExoterWheelwalkingControl::selectNextGait()
 	selectMode(SINGLE_WHEEL);
 	break;
     case SINGLE_WHEEL:
+        selectMode(NORMAL_DRIVING);
+	break;
+    case NORMAL_DRIVING:
         selectMode(AXLE_BY_AXLE);
 	break;
     }

@@ -146,34 +146,39 @@ void ExoterWheelwalkingKinematics::computeMovementJointCommands(const double ww_
         }
 
         break;
+    case NORMAL_DRIVING:
+        break;
     }
 
-    double offset_rolling_rate = offset_speed / wheel_radius;
-    double ww_rolling_rate = ww_speed / wheel_radius * NUMBER_OF_WHEELS / active_wheels.size();
-
     const int ROLLING_OFFSET = NUMBER_OF_PASSIVE_JOINTS + NUMBER_OF_WALKING_WHEELS + NUMBER_OF_STEERABLE_WHEELS;
+
+    double offset_rolling_rate = offset_speed / wheel_radius;
 
     for (int i = 0; i < NUMBER_OF_WHEELS; i++)
         known_joint_rates.insert(std::pair<int,double>(ROLLING_OFFSET + i, offset_rolling_rate));
 
-    double step_sum = 0.0d;
-
-    for (unsigned int i = 0; i < active_wheels.size(); i++)
+    if (active_wheels.size() != 0)
     {
-        known_joint_rates[active_wheels[i]] += ww_rolling_rate;
+        double ww_rolling_rate = ww_speed / wheel_radius * NUMBER_OF_WHEELS / active_wheels.size();
+        double step_sum = 0.0d;
 
-        if (walking_joints_status[active_wheels[i] - ROLLING_OFFSET])
+        for (unsigned int i = 0; i < active_wheels.size(); i++)
         {
-            step_sum += positions[active_wheels[i]];
+            known_joint_rates[active_wheels[i]] += ww_rolling_rate;
+
+            if (walking_joints_status[active_wheels[i] - ROLLING_OFFSET])
+            {
+                step_sum += positions[active_wheels[i]];
+            }
+            else
+            {
+                // Virtual joint position to handle disabled walking joint
+                step_sum += positions[active_wheels[i]] * NUMBER_OF_WHEELS / active_wheels.size();
+            }
         }
-        else
-        {
-            // Virtual joint position to handle disabled walking joint
-            step_sum += positions[active_wheels[i]] * NUMBER_OF_WHEELS / active_wheels.size();
-        }
+
+        step_distance += wheel_radius * step_sum / active_wheels.size();
     }
-
-    step_distance += wheel_radius * step_sum / active_wheels.size();
 
     switch (mode)
     {
@@ -217,6 +222,8 @@ void ExoterWheelwalkingKinematics::computeMovementJointCommands(const double ww_
                 step_distance = step_length;
             }
         }
+        break;
+    case NORMAL_DRIVING:
         break;
     }
 
@@ -275,16 +282,5 @@ void ExoterWheelwalkingKinematics::setMode(unsigned int mode)
 {
     this->mode = mode;
     this->state = 0;
-
-    switch (mode)
-    {
-        case AXLE_BY_AXLE:
-        case SINGLE_WHEEL:
-            this->step_distance = 0;
-            break;
-        case SIDE_BY_SIDE:
-        case EVEN_ODD:
-            this->step_distance = 0;//this->step_length / 2;
-            break;
-    }
+    this->step_distance = 0;
 }
