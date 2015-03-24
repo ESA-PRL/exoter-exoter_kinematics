@@ -50,7 +50,7 @@ void ExoterLocomotionControl::setNewJointReadings(const std::vector<double>& pos
     velocity_readings_old = velocity_readings;
 }
 
-void ExoterLocomotionControl::setWalkingJointsStatus(const std::vector<bool> walking_joints_status)
+void ExoterLocomotionControl::setWalkingJointsStatus(const std::vector<bool>& walking_joints_status)
 {
     this->walking_joints_status = walking_joints_status;
 }
