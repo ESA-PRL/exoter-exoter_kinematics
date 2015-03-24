@@ -19,6 +19,7 @@ namespace exoter
     public:
         void getJointCommands(std::vector<double>& position_commands, std::vector<double>& velocity_commands);
         void setNewJointReadings(const std::vector<double>& position_readings, const std::vector<double>& velocity_readings);
+	void setWalkingJointsStatus(const std::vector<bool> walking_joints_status);
         void selectMode(const unsigned int mode);
         void setSpeed(const double speed);
 	void stopMotion();
@@ -37,6 +38,7 @@ namespace exoter
         std::vector<double> velocities;
         std::vector<double> position_readings_old;
         std::vector<double> velocity_readings_old;
+	std::vector<bool> walking_joints_status;
 
         bool checkTargetJointPositionsReached();
         std::vector<double> assemblePositionVector(const std::vector<double> position_readings);

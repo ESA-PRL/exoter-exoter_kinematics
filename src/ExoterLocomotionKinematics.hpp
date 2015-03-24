@@ -21,9 +21,11 @@ namespace exoter
         virtual ~ExoterLocomotionKinematics();
 
         virtual void setMode(const unsigned int mode);
-        virtual void computeConfigChangeJointCommands(const std::vector<double>& positions, const std::vector<double> &velocities,
-                                                      std::vector<double>& position_commands, std::vector<double> &velocity_commands) = 0;
-        virtual void computeMovementJointCommands(const double speed, const std::vector<double>& positions, const std::vector<double>& velocities,
+        virtual void computeConfigChangeJointCommands(const std::vector<bool>& walking_joints_status,
+						                              const std::vector<double>& positions, const std::vector<double>& velocities,
+                                                      std::vector<double>& position_commands, std::vector<double>& velocity_commands) = 0;
+        virtual void computeMovementJointCommands(const double speed, const std::vector<bool>& walking_joints_status,
+                                                  const std::vector<double>& positions, const std::vector<double>& velocities,
                                                   std::vector<double>& position_commands, std::vector<double>& velocity_commands) = 0;
         virtual std::vector<double> getConfigChangeTargetJointPositions() = 0;
     protected:

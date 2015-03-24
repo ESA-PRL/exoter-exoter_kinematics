@@ -12,7 +12,8 @@ ExoterEgressKinematics::~ExoterEgressKinematics()
 {
 }
 
-void ExoterEgressKinematics::computeConfigChangeJointCommands(const std::vector<double>& positions, const std::vector<double>& velocities,
+void ExoterEgressKinematics::computeConfigChangeJointCommands(const std::vector<bool>& walking_joints_status,
+                                                              const std::vector<double>& positions, const std::vector<double>& velocities,
                                                               std::vector<double>& position_commands, std::vector<double>& velocity_commands)
 {
     std::vector<double> target_positions = getConfigChangeTargetJointPositions();
@@ -82,7 +83,7 @@ void ExoterEgressKinematics::computeConfigChangeJointCommands(const std::vector<
     }
 }
 
-void ExoterEgressKinematics::computeMovementJointCommands(const double speed, const std::vector<double>& positions, const std::vector<double>& velocities,
+void ExoterEgressKinematics::computeMovementJointCommands(const double speed, const std::vector<bool>& walking_joints_status, const std::vector<double>& positions, const std::vector<double>& velocities,
                                                           std::vector<double>& position_commands, std::vector<double>& velocity_commands)
 {
     switch (mode)

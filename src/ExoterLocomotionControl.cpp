@@ -26,7 +26,7 @@ void ExoterLocomotionControl::getJointCommands(std::vector<double>& position_com
         }
         else
         {
-            kinematics->computeConfigChangeJointCommands(positions, velocities, position_commands, velocity_commands);
+            kinematics->computeConfigChangeJointCommands(walking_joints_status, positions, velocities, position_commands, velocity_commands);
             return;
         }
     }
@@ -38,7 +38,7 @@ void ExoterLocomotionControl::getJointCommands(std::vector<double>& position_com
 	}
 	else
 	{
-	    kinematics->computeMovementJointCommands(speed, positions, velocities, position_commands, velocity_commands);
+	    kinematics->computeMovementJointCommands(speed, walking_joints_status, positions, velocities, position_commands, velocity_commands);
 	}
 }
 
@@ -86,6 +86,9 @@ bool ExoterLocomotionControl::checkTargetJointPositionsReached()
 
     for (unsigned int i = 0; i < joint_positions.size(); i++)
     {
+		if (!walking_joints_status[i])
+			continue;
+
         if (std::abs(joint_positions[i] - target_joint_positions[i]) > MAX_POS_OFFSET)
             return false;
     }

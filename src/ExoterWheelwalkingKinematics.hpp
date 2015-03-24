@@ -21,9 +21,11 @@ namespace exoter
         ExoterWheelwalkingKinematics(const unsigned int mode, const double wheel_radius);
         ~ExoterWheelwalkingKinematics();
 
-        void computeConfigChangeJointCommands(const std::vector<double>& positions, const std::vector<double> &velocities,
-                                              std::vector<double>& position_commands, std::vector<double> &velocity_commands);
-        void computeMovementJointCommands(const double ww_speed, const std::vector<double>& positions, const std::vector<double>& velocities,
+        void computeConfigChangeJointCommands(const std::vector<bool>& walking_joints_status,
+					      const std::vector<double>& positions, const std::vector<double>& velocities,
+                                              std::vector<double>& position_commands, std::vector<double>& velocity_commands);
+        void computeMovementJointCommands(const double ww_speed, const std::vector<bool>& walking_joints_status,
+					  const std::vector<double>& positions, const std::vector<double>& velocities,
                                           std::vector<double>& position_commands, std::vector<double>& velocity_commands);
         std::vector<double> getConfigChangeTargetJointPositions();
         void setMode(unsigned int mode);
