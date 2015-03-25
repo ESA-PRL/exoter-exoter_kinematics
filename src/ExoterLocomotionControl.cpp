@@ -73,7 +73,9 @@ void ExoterLocomotionControl::startMotion()
 void ExoterLocomotionControl::initJointConfiguration()
 {
     mode_transition = true;
-    std::cout << "Transitioning to initial configuration..." << std::endl;	
+    kinematics->initMode();
+
+    std::cout << "Transitioning to initial configuration..." << std::endl;
 }
 
 void ExoterLocomotionControl::selectMode(const unsigned int mode)
@@ -81,7 +83,7 @@ void ExoterLocomotionControl::selectMode(const unsigned int mode)
     current_mode = mode;
     kinematics->setMode(mode);
 
-	initJointConfiguration();
+    initJointConfiguration();
 }
 
 bool ExoterLocomotionControl::checkTargetJointPositionsReached()

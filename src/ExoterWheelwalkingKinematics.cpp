@@ -147,6 +147,13 @@ void ExoterWheelwalkingKinematics::computeMovementJointCommands(const double ww_
 
         break;
     case NORMAL_DRIVING:
+        active_wheels.push_back(ROLLING_FL);    
+        active_wheels.push_back(ROLLING_FR);
+        active_wheels.push_back(ROLLING_ML);
+        active_wheels.push_back(ROLLING_MR);
+        active_wheels.push_back(ROLLING_RL);
+        active_wheels.push_back(ROLLING_RR);
+
         break;
     }
 
@@ -278,9 +285,8 @@ std::vector<double> ExoterWheelwalkingKinematics::getConfigChangeTargetJointPosi
     return joint_positions;
 }
 
-void ExoterWheelwalkingKinematics::setMode(unsigned int mode)
+void ExoterWheelwalkingKinematics::initMode()
 {
-    this->mode = mode;
     this->state = 0;
-    this->step_distance = 0;
+    this->step_distance = 0;	
 }

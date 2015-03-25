@@ -31,6 +31,7 @@ namespace exoter
 
         double getHeightOffset();
         void setHeightOffset(const double height_offset);
+	void initMode();
     private:
         double height_offset;
     };

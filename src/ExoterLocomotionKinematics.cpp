@@ -15,4 +15,5 @@ ExoterLocomotionKinematics::~ExoterLocomotionKinematics()
 void ExoterLocomotionKinematics::setMode(const unsigned int mode)
 {
     this->mode = mode;
+    initMode();
 }

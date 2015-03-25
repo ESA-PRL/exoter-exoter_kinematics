@@ -42,7 +42,7 @@ namespace exoter
     public:
 
         ExoterKinematicModel(const double wheel_radius);//constructor
-        ~ExoterKinematicModel();//destructor
+        virtual ~ExoterKinematicModel();//destructor
 
         std::string name();
         void contactPointsPerTree (std::vector<unsigned int> &contactPoints);

@@ -29,6 +29,7 @@ namespace exoter
                                           std::vector<double>& position_commands, std::vector<double>& velocity_commands);
         std::vector<double> getConfigChangeTargetJointPositions();
         void setMode(unsigned int mode);
+        void initMode();
         void setOffsetSpeed(const double offset_speed);
         void setStepLength(const double step_length);
     private:

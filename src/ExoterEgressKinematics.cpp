@@ -229,3 +229,8 @@ void ExoterEgressKinematics::setHeightOffset(const double height_offset)
 {
     this->height_offset = height_offset;
 }
+
+void ExoterEgressKinematics::initMode()
+{
+    return;
+}

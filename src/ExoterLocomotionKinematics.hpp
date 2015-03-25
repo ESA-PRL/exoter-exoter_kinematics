@@ -20,7 +20,7 @@ namespace exoter
         ExoterLocomotionKinematics(const double wheel_radius, const unsigned int mode);
         virtual ~ExoterLocomotionKinematics();
 
-        virtual void setMode(const unsigned int mode);
+        void setMode(const unsigned int mode);
         virtual void computeConfigChangeJointCommands(const std::vector<bool>& walking_joints_status,
 						                              const std::vector<double>& positions, const std::vector<double>& velocities,
                                                       std::vector<double>& position_commands, std::vector<double>& velocity_commands) = 0;
@@ -28,6 +28,7 @@ namespace exoter
                                                   const std::vector<double>& positions, const std::vector<double>& velocities,
                                                   std::vector<double>& position_commands, std::vector<double>& velocity_commands) = 0;
         virtual std::vector<double> getConfigChangeTargetJointPositions() = 0;
+	virtual void initMode() = 0;
     protected:
         ExoterKinematicModel* kinematic_model;
         unsigned int mode;
