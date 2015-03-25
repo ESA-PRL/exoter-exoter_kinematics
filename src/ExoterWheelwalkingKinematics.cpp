@@ -333,4 +333,5 @@ void ExoterWheelwalkingKinematics::initMode()
     case SIDE_BY_SIDE:
     case EVEN_ODD:
         this->step_distance = this->step_length / 2;
+    }
 }
