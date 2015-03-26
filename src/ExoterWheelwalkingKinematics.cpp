@@ -121,12 +121,12 @@ void ExoterWheelwalkingKinematics::computeMovementJointCommands(const double ww_
 
         switch (state)
         {
-            case LEFT_SIDE:
+            case EVEN:
                 active_wheels.push_back(ROLLING_FL);
                 active_wheels.push_back(ROLLING_MR);
                 active_wheels.push_back(ROLLING_RL); 
                 break;
-            case RIGHT_SIDE:
+            case ODD:
                 active_wheels.push_back(ROLLING_FR);
                 active_wheels.push_back(ROLLING_ML);
                 active_wheels.push_back(ROLLING_RR);
