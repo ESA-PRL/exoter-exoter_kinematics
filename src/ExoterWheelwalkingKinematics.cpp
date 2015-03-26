@@ -179,13 +179,20 @@ void ExoterWheelwalkingKinematics::computeMovementJointCommands(const double ww_
 
     double offset_rolling_rate = offset_speed / wheel_radius;
 
+    std::cout << "---" << std::endl;
+
     for (int i = 0; i < NUMBER_OF_WHEELS; i++)
+    {
         known_joint_rates.insert(std::pair<int,double>(ROLLING_OFFSET + i, offset_rolling_rate));
+        std::cout << "Angle delta of rolling joint " << i << ": " positions[active_wheels[i]] << std::endl;
+    }
 
     if (num_active_wheels != 0)
     {
         double ww_rolling_rate = ww_speed / wheel_radius * num_phases;
         double step_sum = 0.0d;
+
+        int num_active_walking_wheels = num_active_wheels;
 
         for (unsigned int i = 0; i < num_active_wheels; i++)
         {
@@ -197,12 +204,11 @@ void ExoterWheelwalkingKinematics::computeMovementJointCommands(const double ww_
             }
             else
             {
-                // Virtual joint position to handle disabled walking joint
-                step_sum += positions[active_wheels[i]] * num_phases;
+                num_active_walking_wheels--;
             }
         }
 
-        step_distance += wheel_radius * step_sum / num_active_wheels;
+        step_distance += wheel_radius * step_sum / num_active_walking_wheels;
     }
 
     if ((ww_speed > 0 && step_distance >= step_length) || (ww_speed < 0 && step_distance <= 0))
@@ -275,7 +281,7 @@ void ExoterWheelwalkingKinematics::computeMovementJointCommands(const double ww_
         if (!walking_joints_status[i])
         {
             // Set desired joint rate of disabled walking joint to zero and remove constraint on corresponding rolling joint
-            known_joint_rates.erase(NUMBER_OF_PASSIVE_JOINTS + NUMBER_OF_WALKING_WHEELS + NUMBER_OF_STEERABLE_WHEELS + i);
+            known_joint_rates.erase(ROLLING_OFFSET + i);
             known_joint_rates.insert(std::pair<int,double>(NUMBER_OF_PASSIVE_JOINTS + i, 0.0d));
 
             no_disabled_walking_joint = false;
