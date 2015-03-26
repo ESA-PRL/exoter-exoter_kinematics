@@ -184,7 +184,7 @@ void ExoterWheelwalkingKinematics::computeMovementJointCommands(const double ww_
     for (int i = 0; i < NUMBER_OF_WHEELS; i++)
     {
         known_joint_rates.insert(std::pair<int,double>(ROLLING_OFFSET + i, offset_rolling_rate));
-        std::cout << "Angle delta of rolling joint " << i << ": " positions[active_wheels[i]] << std::endl;
+        std::cout << "Angle delta of rolling joint " << i << ": " << positions[ROLLING_OFFSET + i] << std::endl;
     }
 
     if (num_active_wheels != 0)
