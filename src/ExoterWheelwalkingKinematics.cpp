@@ -70,8 +70,8 @@ void ExoterWheelwalkingKinematics::computeMovementJointCommands(const double ww_
 
     std::vector<int> active_wheels;
 
-    int num_phases;
-    int num_active_wheels;
+    unsigned int num_phases = 0;
+    unsigned int num_active_wheels;
 
     switch (mode)
     {
