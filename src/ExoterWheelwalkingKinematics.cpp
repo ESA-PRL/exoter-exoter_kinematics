@@ -179,12 +179,9 @@ void ExoterWheelwalkingKinematics::computeMovementJointCommands(const double ww_
 
     double offset_rolling_rate = offset_speed / wheel_radius;
 
-    std::cout << "---" << std::endl;
-
     for (int i = 0; i < NUMBER_OF_WHEELS; i++)
     {
         known_joint_rates.insert(std::pair<int,double>(ROLLING_OFFSET + i, offset_rolling_rate));
-        std::cout << "Angle delta of rolling joint " << i << ": " << positions[ROLLING_OFFSET + i] << std::endl;
     }
 
     if (num_active_wheels != 0)
@@ -209,6 +206,8 @@ void ExoterWheelwalkingKinematics::computeMovementJointCommands(const double ww_
         }
 
         step_distance += wheel_radius * step_sum / num_active_walking_wheels;
+
+//        std::cout << "Step distance: " << step_distance << std::endl;
     }
 
     if ((ww_speed > 0 && step_distance >= step_length) || (ww_speed < 0 && step_distance <= 0))
@@ -340,4 +339,6 @@ void ExoterWheelwalkingKinematics::initMode()
     case EVEN_ODD:
         this->step_distance = this->step_length / 2;
     }
+
+//    std::cout << "Init step distance: " << step_distance << std::endl;
 }
