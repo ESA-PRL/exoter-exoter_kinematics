@@ -9,7 +9,7 @@
 
 //#define DEBUG_PRINTS 1
 
-using namespace exoter;
+using namespace exoter_kinematics;
 
 ExoterKinematicKDL::ExoterKinematicKDL (std::string &urdf_file, const double wheel_radius)
 {
@@ -157,7 +157,7 @@ void ExoterKinematicKDL::fkBody2ContactPointt(const int chainIdx, const std::vec
     {
         KDL::SegmentMap::const_iterator root = this->tree.getRootSegment();
 
-        if (chainIdx > exoter::NUMBER_OF_WHEELS)
+        if (chainIdx > exoter_kinematics::NUMBER_OF_WHEELS)
         {
             fkTrans.matrix() = std::numeric_limits<double>::quiet_NaN() * Eigen::Matrix<double, 4, 4>::Identity();
 
@@ -230,9 +230,9 @@ void ExoterKinematicKDL::fkBody2ContactPointt(const int chainIdx, const std::vec
                     jointpositions(5) = this->wheelRadius*positions[14];//displacement due to wheel rotation
 
                     /** Slip vector **/
-                    jointpositions(6) = positions[exoter::EXOTER_JOINT_DOF];
-                    jointpositions(7) = positions[exoter::EXOTER_JOINT_DOF+1];
-                    jointpositions(8) = positions[exoter::EXOTER_JOINT_DOF+2];
+                    jointpositions(6) = positions[exoter_kinematics::EXOTER_JOINT_DOF];
+                    jointpositions(7) = positions[exoter_kinematics::EXOTER_JOINT_DOF+1];
+                    jointpositions(8) = positions[exoter_kinematics::EXOTER_JOINT_DOF+2];
 
                     break;
                 case 2:
@@ -243,9 +243,9 @@ void ExoterKinematicKDL::fkBody2ContactPointt(const int chainIdx, const std::vec
                     jointpositions(4) = this->wheelRadius*positions[15];//displacement due to wheel rotation
 
                     /** Slip vector **/
-                    jointpositions(5) = positions[exoter::EXOTER_JOINT_DOF];
-                    jointpositions(6) = positions[exoter::EXOTER_JOINT_DOF+1];
-                    jointpositions(7) = positions[exoter::EXOTER_JOINT_DOF+2];
+                    jointpositions(5) = positions[exoter_kinematics::EXOTER_JOINT_DOF];
+                    jointpositions(6) = positions[exoter_kinematics::EXOTER_JOINT_DOF+1];
+                    jointpositions(7) = positions[exoter_kinematics::EXOTER_JOINT_DOF+2];
 
                     break;
                 case 3:
@@ -256,9 +256,9 @@ void ExoterKinematicKDL::fkBody2ContactPointt(const int chainIdx, const std::vec
                     jointpositions(4) = this->wheelRadius*positions[16];//displacement due to wheel rotation
 
                     /** Slip vector **/
-                    jointpositions(5) = positions[exoter::EXOTER_JOINT_DOF];
-                    jointpositions(6) = positions[exoter::EXOTER_JOINT_DOF+1];
-                    jointpositions(7) = positions[exoter::EXOTER_JOINT_DOF+2];
+                    jointpositions(5) = positions[exoter_kinematics::EXOTER_JOINT_DOF];
+                    jointpositions(6) = positions[exoter_kinematics::EXOTER_JOINT_DOF+1];
+                    jointpositions(7) = positions[exoter_kinematics::EXOTER_JOINT_DOF+2];
 
 
                     break;
@@ -271,9 +271,9 @@ void ExoterKinematicKDL::fkBody2ContactPointt(const int chainIdx, const std::vec
                     jointpositions(5) = this->wheelRadius*positions[17];//displacement due to wheel rotation
 
                     /** Slip vector **/
-                    jointpositions(6) = positions[exoter::EXOTER_JOINT_DOF];
-                    jointpositions(7) = positions[exoter::EXOTER_JOINT_DOF+1];
-                    jointpositions(8) = positions[exoter::EXOTER_JOINT_DOF+2];
+                    jointpositions(6) = positions[exoter_kinematics::EXOTER_JOINT_DOF];
+                    jointpositions(7) = positions[exoter_kinematics::EXOTER_JOINT_DOF+1];
+                    jointpositions(8) = positions[exoter_kinematics::EXOTER_JOINT_DOF+2];
 
                     break;
                 case 5:
@@ -285,9 +285,9 @@ void ExoterKinematicKDL::fkBody2ContactPointt(const int chainIdx, const std::vec
                     jointpositions(5) = this->wheelRadius*positions[18];//displacement due to wheel rotation
 
                     /** Slip vector **/
-                    jointpositions(6) = positions[exoter::EXOTER_JOINT_DOF];
-                    jointpositions(7) = positions[exoter::EXOTER_JOINT_DOF+1];
-                    jointpositions(8) = positions[exoter::EXOTER_JOINT_DOF+2];
+                    jointpositions(6) = positions[exoter_kinematics::EXOTER_JOINT_DOF];
+                    jointpositions(7) = positions[exoter_kinematics::EXOTER_JOINT_DOF+1];
+                    jointpositions(8) = positions[exoter_kinematics::EXOTER_JOINT_DOF+2];
 
                     break;
                 default:
@@ -299,9 +299,9 @@ void ExoterKinematicKDL::fkBody2ContactPointt(const int chainIdx, const std::vec
                     jointpositions(5) = this->wheelRadius*positions[13];//displacement due to wheel rotation
 
                     /** Slip vector **/
-                    jointpositions(6) = positions[exoter::EXOTER_JOINT_DOF];
-                    jointpositions(7) = positions[exoter::EXOTER_JOINT_DOF+1];
-                    jointpositions(8) = positions[exoter::EXOTER_JOINT_DOF+2];
+                    jointpositions(6) = positions[exoter_kinematics::EXOTER_JOINT_DOF];
+                    jointpositions(7) = positions[exoter_kinematics::EXOTER_JOINT_DOF+1];
+                    jointpositions(8) = positions[exoter_kinematics::EXOTER_JOINT_DOF+2];
 
                     break;
             }
@@ -349,7 +349,7 @@ void ExoterKinematicKDL::fkSolver(const std::vector<double> &positions, std::vec
         std::fill(chainpositions.begin(), chainpositions.end(), 0.00);
 
         /** Fill the beginning (common part) **/
-        for (register int i=0; i<exoter::EXOTER_JOINT_DOF; ++i)
+        for (register int i=0; i<exoter_kinematics::EXOTER_JOINT_DOF; ++i)
         {
             chainpositions[i] = positions[i];
         }
@@ -358,9 +358,9 @@ void ExoterKinematicKDL::fkSolver(const std::vector<double> &positions, std::vec
         for (register int i=0; i<static_cast<int>(this->number_wheels); ++i)
         {
             /** Create the joints for this chain (the rest) **/
-            for (register int l=0; l<exoter::SLIP_VECTOR_SIZE; ++l)
+            for (register int l=0; l<exoter_kinematics::SLIP_VECTOR_SIZE; ++l)
             {
-                chainpositions[exoter::EXOTER_JOINT_DOF+l] = positions[exoter::EXOTER_JOINT_DOF+(exoter::SLIP_VECTOR_SIZE*i)+l];
+                chainpositions[exoter_kinematics::EXOTER_JOINT_DOF+l] = positions[exoter_kinematics::EXOTER_JOINT_DOF+(exoter_kinematics::SLIP_VECTOR_SIZE*i)+l];
             }
 
             /** Contact angle **/
@@ -385,7 +385,7 @@ void ExoterKinematicKDL::fkSolver(const std::vector<double> &positions, std::vec
 
 Eigen::Matrix<double, 6*NUMBER_OF_WHEELS, ExoterKinematicKDL::MODEL_DOF> ExoterKinematicKDL::jacobianSolver(const std::vector<double> &positions)
 {
-    Eigen::Matrix<double, 6*exoter::NUMBER_OF_WHEELS, ExoterKinematicKDL::MODEL_DOF> J;
+    Eigen::Matrix<double, 6*exoter_kinematics::NUMBER_OF_WHEELS, ExoterKinematicKDL::MODEL_DOF> J;
 
     /** Check if the number of values is correct **/
     if (positions.size() == ExoterKinematicKDL::MODEL_DOF)
@@ -447,36 +447,36 @@ Eigen::Matrix<double, 6*NUMBER_OF_WHEELS, ExoterKinematicKDL::MODEL_DOF> ExoterK
                     jointpositions(1) = -positions[1];//mimic
                     jointpositions(2) = positions[4];//wheel walking
                     jointpositions(3) = positions[10];//steer
-                    jointpositions(4) = positions[exoter::EXOTER_JOINT_DOF+(exoter::NUMBER_OF_WHEELS*exoter::SLIP_VECTOR_SIZE)+1];
+                    jointpositions(4) = positions[exoter_kinematics::EXOTER_JOINT_DOF+(exoter_kinematics::NUMBER_OF_WHEELS*exoter_kinematics::SLIP_VECTOR_SIZE)+1];
                     jointpositions(5) = 0.00;//displacement due to wheel rotation
 
                     /** Slip vector **/
-                    for(register int j=0; j<static_cast<int>(exoter::SLIP_VECTOR_SIZE); ++j)
-                        jointpositions(6+j) = positions[exoter::EXOTER_JOINT_DOF+(i*exoter::SLIP_VECTOR_SIZE)+j];
+                    for(register int j=0; j<static_cast<int>(exoter_kinematics::SLIP_VECTOR_SIZE); ++j)
+                        jointpositions(6+j) = positions[exoter_kinematics::EXOTER_JOINT_DOF+(i*exoter_kinematics::SLIP_VECTOR_SIZE)+j];
 
                     break;
                 case 2:
                     jointpositions(0) = positions[0];//passive
                     jointpositions(1) = -positions[0];//mimic
                     jointpositions(2) = positions[5];//wheel walking
-                    jointpositions(3) = positions[exoter::EXOTER_JOINT_DOF+(exoter::NUMBER_OF_WHEELS*exoter::SLIP_VECTOR_SIZE)+2];
+                    jointpositions(3) = positions[exoter_kinematics::EXOTER_JOINT_DOF+(exoter_kinematics::NUMBER_OF_WHEELS*exoter_kinematics::SLIP_VECTOR_SIZE)+2];
                     jointpositions(4) = 0.00;//displacement due to wheel rotation
 
                     /** Slip vector **/
-                    for(register int j=0; j<static_cast<int>(exoter::SLIP_VECTOR_SIZE); ++j)
-                        jointpositions(5+j) = positions[exoter::EXOTER_JOINT_DOF+(i*exoter::SLIP_VECTOR_SIZE)+j];
+                    for(register int j=0; j<static_cast<int>(exoter_kinematics::SLIP_VECTOR_SIZE); ++j)
+                        jointpositions(5+j) = positions[exoter_kinematics::EXOTER_JOINT_DOF+(i*exoter_kinematics::SLIP_VECTOR_SIZE)+j];
 
                     break;
                 case 3:
                     jointpositions(0) = positions[1];//passive
                     jointpositions(1) = -positions[1];//mimic
                     jointpositions(2) = positions[6];//wheel walking
-                    jointpositions(3) = positions[exoter::EXOTER_JOINT_DOF+(exoter::NUMBER_OF_WHEELS*exoter::SLIP_VECTOR_SIZE)+3];
+                    jointpositions(3) = positions[exoter_kinematics::EXOTER_JOINT_DOF+(exoter_kinematics::NUMBER_OF_WHEELS*exoter_kinematics::SLIP_VECTOR_SIZE)+3];
                     jointpositions(4) = 0.00;//displacement due to wheel rotation
 
                     /** Slip vector **/
-                    for(register int j=0; j<static_cast<int>(exoter::SLIP_VECTOR_SIZE); ++j)
-                        jointpositions(5+j) = positions[exoter::EXOTER_JOINT_DOF+(i*exoter::SLIP_VECTOR_SIZE)+j];
+                    for(register int j=0; j<static_cast<int>(exoter_kinematics::SLIP_VECTOR_SIZE); ++j)
+                        jointpositions(5+j) = positions[exoter_kinematics::EXOTER_JOINT_DOF+(i*exoter_kinematics::SLIP_VECTOR_SIZE)+j];
 
                     break;
                 case 4:
@@ -484,12 +484,12 @@ Eigen::Matrix<double, 6*NUMBER_OF_WHEELS, ExoterKinematicKDL::MODEL_DOF> ExoterK
                     jointpositions(1) = -positions[2];//mimic
                     jointpositions(2) = positions[7];//wheel walking
                     jointpositions(3) = positions[11];//steer
-                    jointpositions(4) = positions[exoter::EXOTER_JOINT_DOF+(exoter::NUMBER_OF_WHEELS*exoter::SLIP_VECTOR_SIZE)+4];
+                    jointpositions(4) = positions[exoter_kinematics::EXOTER_JOINT_DOF+(exoter_kinematics::NUMBER_OF_WHEELS*exoter_kinematics::SLIP_VECTOR_SIZE)+4];
                     jointpositions(5) = 0.00;//displacement due to wheel rotation
 
                     /** Slip vector **/
-                    for(register int j=0; j<static_cast<int>(exoter::SLIP_VECTOR_SIZE); ++j)
-                        jointpositions(6+j) = positions[exoter::EXOTER_JOINT_DOF+(i*exoter::SLIP_VECTOR_SIZE)+j];
+                    for(register int j=0; j<static_cast<int>(exoter_kinematics::SLIP_VECTOR_SIZE); ++j)
+                        jointpositions(6+j) = positions[exoter_kinematics::EXOTER_JOINT_DOF+(i*exoter_kinematics::SLIP_VECTOR_SIZE)+j];
 
                     break;
                 case 5:
@@ -497,12 +497,12 @@ Eigen::Matrix<double, 6*NUMBER_OF_WHEELS, ExoterKinematicKDL::MODEL_DOF> ExoterK
                     jointpositions(1) = -positions[2];//mimic
                     jointpositions(2) = positions[8];//wheel walking
                     jointpositions(3) = positions[12];//steer
-                    jointpositions(4) = positions[exoter::EXOTER_JOINT_DOF+(exoter::NUMBER_OF_WHEELS*exoter::SLIP_VECTOR_SIZE)+5];
+                    jointpositions(4) = positions[exoter_kinematics::EXOTER_JOINT_DOF+(exoter_kinematics::NUMBER_OF_WHEELS*exoter_kinematics::SLIP_VECTOR_SIZE)+5];
                     jointpositions(5) = 0.00;//displacement due to wheel rotation
 
                     /** Slip vector **/
-                    for(register int j=0; j<static_cast<int>(exoter::SLIP_VECTOR_SIZE); ++j)
-                        jointpositions(6+j) = positions[exoter::EXOTER_JOINT_DOF+(i*exoter::SLIP_VECTOR_SIZE)+j];
+                    for(register int j=0; j<static_cast<int>(exoter_kinematics::SLIP_VECTOR_SIZE); ++j)
+                        jointpositions(6+j) = positions[exoter_kinematics::EXOTER_JOINT_DOF+(i*exoter_kinematics::SLIP_VECTOR_SIZE)+j];
 
                     break;
 
@@ -511,12 +511,12 @@ Eigen::Matrix<double, 6*NUMBER_OF_WHEELS, ExoterKinematicKDL::MODEL_DOF> ExoterK
                     jointpositions(1) = -positions[0];//mimic
                     jointpositions(2) = positions[3];//wheel walking
                     jointpositions(3) = positions[9];//steer
-                    jointpositions(4) = positions[exoter::EXOTER_JOINT_DOF+(exoter::NUMBER_OF_WHEELS*exoter::SLIP_VECTOR_SIZE)+0];
+                    jointpositions(4) = positions[exoter_kinematics::EXOTER_JOINT_DOF+(exoter_kinematics::NUMBER_OF_WHEELS*exoter_kinematics::SLIP_VECTOR_SIZE)+0];
                     jointpositions(5) = 0.00;//displacement due to wheel rotation
 
                     /** Slip vector **/
-                    for(register int j=0; j<static_cast<int>(exoter::SLIP_VECTOR_SIZE); ++j)
-                        jointpositions(6+j) = positions[exoter::EXOTER_JOINT_DOF+(i*exoter::SLIP_VECTOR_SIZE)+j];
+                    for(register int j=0; j<static_cast<int>(exoter_kinematics::SLIP_VECTOR_SIZE); ++j)
+                        jointpositions(6+j) = positions[exoter_kinematics::EXOTER_JOINT_DOF+(i*exoter_kinematics::SLIP_VECTOR_SIZE)+j];
 
                     break;
             }
@@ -605,13 +605,13 @@ Eigen::Matrix<double, 6*NUMBER_OF_WHEELS, ExoterKinematicKDL::MODEL_DOF> ExoterK
             {
              case 0: case 1: case 4: case 5:
                 /** Slip Vector and Contact angles **/
-                wheelJacobian[i].block<6, exoter::SLIP_VECTOR_SIZE+exoter::CONTACT_POINT_DOF>(0, exoter::EXOTER_JOINT_DOF) =
-                    eigenjacob.block<6, exoter::SLIP_VECTOR_SIZE+exoter::CONTACT_POINT_DOF>(0, 6);
+                wheelJacobian[i].block<6, exoter_kinematics::SLIP_VECTOR_SIZE+exoter_kinematics::CONTACT_POINT_DOF>(0, exoter_kinematics::EXOTER_JOINT_DOF) =
+                    eigenjacob.block<6, exoter_kinematics::SLIP_VECTOR_SIZE+exoter_kinematics::CONTACT_POINT_DOF>(0, 6);
                 break;
              case 2: case 3:
                 /** Slip Vector and Contact angles **/
-                wheelJacobian[i].block<6, exoter::SLIP_VECTOR_SIZE+exoter::CONTACT_POINT_DOF>(0, exoter::EXOTER_JOINT_DOF) =
-                    eigenjacob.block<6, exoter::SLIP_VECTOR_SIZE+exoter::CONTACT_POINT_DOF>(0, 5);
+                wheelJacobian[i].block<6, exoter_kinematics::SLIP_VECTOR_SIZE+exoter_kinematics::CONTACT_POINT_DOF>(0, exoter_kinematics::EXOTER_JOINT_DOF) =
+                    eigenjacob.block<6, exoter_kinematics::SLIP_VECTOR_SIZE+exoter_kinematics::CONTACT_POINT_DOF>(0, 5);
                 break;
              default:
                 break;
@@ -631,11 +631,11 @@ Eigen::Matrix<double, 6*NUMBER_OF_WHEELS, ExoterKinematicKDL::MODEL_DOF> ExoterK
         for (register int i=0; i<static_cast<int>(this->number_wheels); ++i)
         {
             /** Joints including wheel rotation **/
-            J.block<6, exoter::EXOTER_JOINT_DOF>(6*i, 0) = wheelJacobian[i].block<6, exoter::EXOTER_JOINT_DOF>(0,0);
+            J.block<6, exoter_kinematics::EXOTER_JOINT_DOF>(6*i, 0) = wheelJacobian[i].block<6, exoter_kinematics::EXOTER_JOINT_DOF>(0,0);
             /** Slip vectors **/
-            J.block<6, exoter::SLIP_VECTOR_SIZE>(6*i, exoter::EXOTER_JOINT_DOF+(exoter::SLIP_VECTOR_SIZE*i)) = wheelJacobian[i].block<6, exoter::SLIP_VECTOR_SIZE>(0,exoter::EXOTER_JOINT_DOF);
+            J.block<6, exoter_kinematics::SLIP_VECTOR_SIZE>(6*i, exoter_kinematics::EXOTER_JOINT_DOF+(exoter_kinematics::SLIP_VECTOR_SIZE*i)) = wheelJacobian[i].block<6, exoter_kinematics::SLIP_VECTOR_SIZE>(0,exoter_kinematics::EXOTER_JOINT_DOF);
             /** Contact Angles **/
-            J.block<6, exoter::CONTACT_POINT_DOF>(6*i, exoter::EXOTER_JOINT_DOF+(exoter::SLIP_VECTOR_SIZE*exoter::NUMBER_OF_WHEELS)+(exoter::CONTACT_POINT_DOF*i)) = wheelJacobian[i].block<6, exoter::CONTACT_POINT_DOF>(0,exoter::EXOTER_JOINT_DOF+exoter::SLIP_VECTOR_SIZE);
+            J.block<6, exoter_kinematics::CONTACT_POINT_DOF>(6*i, exoter_kinematics::EXOTER_JOINT_DOF+(exoter_kinematics::SLIP_VECTOR_SIZE*exoter_kinematics::NUMBER_OF_WHEELS)+(exoter_kinematics::CONTACT_POINT_DOF*i)) = wheelJacobian[i].block<6, exoter_kinematics::CONTACT_POINT_DOF>(0,exoter_kinematics::EXOTER_JOINT_DOF+exoter_kinematics::SLIP_VECTOR_SIZE);
         }
 
     }

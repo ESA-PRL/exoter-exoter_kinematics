@@ -7,7 +7,7 @@
  * in configuration files (i.e.: xml,  yml, urdf...)
  */
 
-namespace exoter
+namespace exoter_kinematics
 {
     /** General constants values **/
     static const int NUMBER_OF_WHEELS = 6; /** Six wheels of the chassis **/

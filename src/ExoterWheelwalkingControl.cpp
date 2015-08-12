@@ -4,7 +4,7 @@
 
 #include <iostream>
 
-using namespace exoter;
+using namespace exoter_kinematics;
 
 ExoterWheelwalkingControl::ExoterWheelwalkingControl(const double wheel_radius) : ExoterLocomotionControl(static_cast<unsigned int>(AXLE_BY_AXLE))
 {

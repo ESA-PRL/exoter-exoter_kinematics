@@ -23,10 +23,10 @@
 #include <odometry/KinematicModel.hpp> /** For the Odometry class to inherit **/
 
 /* ExoTer */
-#include <exoter/Configuration.hpp>
+#include <exoter_kinematics/Configuration.hpp>
 
 
-namespace exoter
+namespace exoter_kinematics
 {
 
     class ExoterKinematicModel : public ::odometry::KinematicModel<double, NUMBER_OF_WHEELS, EXOTER_JOINT_DOF, SLIP_VECTOR_SIZE, CONTACT_POINT_DOF>

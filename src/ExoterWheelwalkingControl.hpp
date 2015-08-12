@@ -13,7 +13,7 @@
 #include "ExoterLocomotionControl.hpp"
 #include "ExoterWheelwalkingTypes.hpp"
 
-namespace exoter
+namespace exoter_kinematics
 {
     class ExoterWheelwalkingControl : public ExoterLocomotionControl
     {

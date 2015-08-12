@@ -12,7 +12,7 @@
 #include "Configuration.hpp"
 #include "ExoterLocomotionKinematics.hpp"
 
-namespace exoter
+namespace exoter_kinematics
 {
     class ExoterLocomotionControl
     {

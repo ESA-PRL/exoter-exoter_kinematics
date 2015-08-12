@@ -23,7 +23,7 @@ set(EXOTER_SRCS
     ExoterEgressKinematics.cpp
 )
 
-rock_library(exoter
+rock_library(exoter_kinematics
     ${EXOTER_SRCS}
     DEPS_PKGCONFIG base-types base-lib odometry kdl_parser
     DEPS_CMAKE Boost

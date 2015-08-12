@@ -13,7 +13,7 @@
 #include "ExoterLocomotionKinematics.hpp"
 #include "ExoterKinematicModel.hpp"
 
-namespace exoter
+namespace exoter_kinematics
 {
     class ExoterEgressKinematics : public ExoterLocomotionKinematics
     {

@@ -1,6 +1,6 @@
-#include <exoter/ExoterKinematicKDL.hpp>
-#include <exoter/ExoterKinematicModel.hpp>
-#include <exoter/Configuration.hpp>
+#include <exoter_kinematics/ExoterKinematicKDL.hpp>
+#include <exoter_kinematics/ExoterKinematicModel.hpp>
+#include <exoter_kinematics/Configuration.hpp>
 #include <odometry/MotionModel.hpp>
 
 #include <map>
@@ -11,7 +11,7 @@
 #include <boost/test/included/unit_test.hpp>
 #include <boost/test/floating_point_comparison.hpp>
 
-using namespace exoter;
+using namespace exoter_kinematics;
 
 #ifndef D2R
 #define D2R M_PI/180.00 /** Convert degree to radian **/
@@ -26,20 +26,20 @@ BOOST_AUTO_TEST_CASE( ModelvsKDLTest )
 
     std::string urdf_file = boost::unit_test::framework::master_test_suite().argv[1];
     double wheelRadius = atof(boost::unit_test::framework::master_test_suite().argv[2]);
-    std::vector<double> wheelDrive (exoter::NUMBER_OF_WHEELS, 0);
-    std::vector<double> passiveJoint (exoter::NUMBER_OF_PASSIVE_JOINTS, 0);
-    std::vector<double> steerJoint (exoter::NUMBER_OF_STEERABLE_WHEELS, 0);
-    std::vector<double> wheelWalking (exoter::NUMBER_OF_WALKING_WHEELS, 0);
-    std::vector<double> contactAngle (exoter::NUMBER_OF_WHEELS, 0);
-    std::vector<double> slip (exoter::SLIP_VECTOR_SIZE, 0);
-    std::vector<double> joints (exoter::ExoterKinematicKDL::MODEL_DOF, 0);
+    std::vector<double> wheelDrive (exoter_kinematics::NUMBER_OF_WHEELS, 0);
+    std::vector<double> passiveJoint (exoter_kinematics::NUMBER_OF_PASSIVE_JOINTS, 0);
+    std::vector<double> steerJoint (exoter_kinematics::NUMBER_OF_STEERABLE_WHEELS, 0);
+    std::vector<double> wheelWalking (exoter_kinematics::NUMBER_OF_WALKING_WHEELS, 0);
+    std::vector<double> contactAngle (exoter_kinematics::NUMBER_OF_WHEELS, 0);
+    std::vector<double> slip (exoter_kinematics::SLIP_VECTOR_SIZE, 0);
+    std::vector<double> joints (exoter_kinematics::ExoterKinematicKDL::MODEL_DOF, 0);
     std::vector<Eigen::Affine3d> fkRobotModel, fkRobotKDL;
     std::vector<base::Matrix6d> fkCovModel, fkCovKDL;
 
     std::cout<<"URDF FILE: "<<urdf_file<<"\n";
     std::cout<<"EXOTER WHEEL RADIUS: "<< wheelRadius <<"\n";
-    std::cout<<"EXOTER MODEL_DOF: "<< exoter::ExoterKinematicKDL::MODEL_DOF <<"\n";
-    std::cout<<"EXOTER MODEL_DOF: "<< exoter::ExoterKinematicModel::MODEL_DOF <<"\n";
+    std::cout<<"EXOTER MODEL_DOF: "<< exoter_kinematics::ExoterKinematicKDL::MODEL_DOF <<"\n";
+    std::cout<<"EXOTER MODEL_DOF: "<< exoter_kinematics::ExoterKinematicModel::MODEL_DOF <<"\n";
 
     /** Wheel Drive **/
 //    wheelDrive[0] = 45.00 * D2R; wheelDrive[2] = 45.00 * D2R; wheelDrive[4] = 45.00 * D2R;
@@ -67,32 +67,32 @@ BOOST_AUTO_TEST_CASE( ModelvsKDLTest )
 //    slip[0] = 0.30; //slip[1] = 0.12; slip[2] = 10.0 * D2R;
 
     /** Store the values **/
-    for (register int i=0; i<static_cast<int>(exoter::NUMBER_OF_PASSIVE_JOINTS); ++i)
+    for (register int i=0; i<static_cast<int>(exoter_kinematics::NUMBER_OF_PASSIVE_JOINTS); ++i)
     {
         joints[i] = passiveJoint[i];
     }
-    for (register int i=0; i<static_cast<int>(exoter::NUMBER_OF_WALKING_WHEELS); ++i)
+    for (register int i=0; i<static_cast<int>(exoter_kinematics::NUMBER_OF_WALKING_WHEELS); ++i)
     {
-        joints[i+exoter::NUMBER_OF_PASSIVE_JOINTS] = wheelWalking[i];
+        joints[i+exoter_kinematics::NUMBER_OF_PASSIVE_JOINTS] = wheelWalking[i];
     }
-    for (register int i=0; i<static_cast<int>(exoter::NUMBER_OF_STEERABLE_WHEELS); ++i)
+    for (register int i=0; i<static_cast<int>(exoter_kinematics::NUMBER_OF_STEERABLE_WHEELS); ++i)
     {
-        joints[i+exoter::NUMBER_OF_PASSIVE_JOINTS+exoter::NUMBER_OF_WALKING_WHEELS] = steerJoint[i];
+        joints[i+exoter_kinematics::NUMBER_OF_PASSIVE_JOINTS+exoter_kinematics::NUMBER_OF_WALKING_WHEELS] = steerJoint[i];
     }
-    for (register int i=0; i<static_cast<int>(exoter::NUMBER_OF_WHEELS); ++i)
+    for (register int i=0; i<static_cast<int>(exoter_kinematics::NUMBER_OF_WHEELS); ++i)
     {
-        joints[i+exoter::NUMBER_OF_PASSIVE_JOINTS+exoter::NUMBER_OF_WALKING_WHEELS+exoter::NUMBER_OF_STEERABLE_WHEELS] = wheelDrive[i];
+        joints[i+exoter_kinematics::NUMBER_OF_PASSIVE_JOINTS+exoter_kinematics::NUMBER_OF_WALKING_WHEELS+exoter_kinematics::NUMBER_OF_STEERABLE_WHEELS] = wheelDrive[i];
     }
 
 
     /** Only for the first wheel **/
-    for (register int i=0; i<static_cast<int>(exoter::SLIP_VECTOR_SIZE); ++i)
+    for (register int i=0; i<static_cast<int>(exoter_kinematics::SLIP_VECTOR_SIZE); ++i)
     {
-        joints[i+exoter::NUMBER_OF_PASSIVE_JOINTS+exoter::NUMBER_OF_WALKING_WHEELS+exoter::NUMBER_OF_STEERABLE_WHEELS+exoter::NUMBER_OF_WHEELS] = slip[i];
+        joints[i+exoter_kinematics::NUMBER_OF_PASSIVE_JOINTS+exoter_kinematics::NUMBER_OF_WALKING_WHEELS+exoter_kinematics::NUMBER_OF_STEERABLE_WHEELS+exoter_kinematics::NUMBER_OF_WHEELS] = slip[i];
     }
-    for (register int i=0; i<static_cast<int>(exoter::NUMBER_OF_WHEELS); ++i)
+    for (register int i=0; i<static_cast<int>(exoter_kinematics::NUMBER_OF_WHEELS); ++i)
     {
-        joints[i+exoter::NUMBER_OF_PASSIVE_JOINTS+exoter::NUMBER_OF_WALKING_WHEELS+exoter::NUMBER_OF_STEERABLE_WHEELS+exoter::NUMBER_OF_WHEELS+(exoter::NUMBER_OF_WHEELS*exoter::SLIP_VECTOR_SIZE)] = contactAngle[i];
+        joints[i+exoter_kinematics::NUMBER_OF_PASSIVE_JOINTS+exoter_kinematics::NUMBER_OF_WALKING_WHEELS+exoter_kinematics::NUMBER_OF_STEERABLE_WHEELS+exoter_kinematics::NUMBER_OF_WHEELS+(exoter_kinematics::NUMBER_OF_WHEELS*exoter_kinematics::SLIP_VECTOR_SIZE)] = contactAngle[i];
     }
 
 
@@ -102,14 +102,14 @@ BOOST_AUTO_TEST_CASE( ModelvsKDLTest )
     std::cout << '\n';
 //==============================================================================================
     std::cout<<"********* EXOTER ROBOT MODEL *********\n";
-    exoter::ExoterKinematicModel exoterModel(wheelRadius);
+    exoter_kinematics::ExoterKinematicModel exoterModel(wheelRadius);
     exoterModel.fkSolver(joints, fkRobotModel, fkCovModel);
 
     std::cout<<"fkRobotModel of size: "<<fkRobotModel.size()<<" fkCovModel of size: "<<fkCovModel.size()<<"\n";
 //============================================================================================
 
     std::cout<<"********* EXOTER KDL MODEL *********\n";
-    exoter::ExoterKinematicKDL exoterKDL(urdf_file, wheelRadius);
+    exoter_kinematics::ExoterKinematicKDL exoterKDL(urdf_file, wheelRadius);
 
     std::cout<<"EXOTER max chain DoF: "<<exoterKDL.getMaxChainDoF()<<"\n";
 
@@ -128,14 +128,14 @@ BOOST_AUTO_TEST_CASE( ModelvsKDLTest )
     }
 
     std::cout<<"********* EXOTER ROBOT Model JACOBIAN *********\n\n";
-    Eigen::Matrix <double, 6*NUMBER_OF_WHEELS, exoter::ExoterKinematicModel::MODEL_DOF> JModel;
+    Eigen::Matrix <double, 6*NUMBER_OF_WHEELS, exoter_kinematics::ExoterKinematicModel::MODEL_DOF> JModel;
 
     JModel = exoterModel.jacobianSolver(joints);
 
     std::cout<<"J Model is of size "<<JModel.rows()<<" x "<<JModel.cols()<<"\n"<< JModel <<"\n";
 
     std::cout<<"**\n\n******* EXOTER KDL JACOBIAN *********\n";
-    Eigen::Matrix <double, 6*NUMBER_OF_WHEELS, exoter::ExoterKinematicKDL::MODEL_DOF> JKdl;
+    Eigen::Matrix <double, 6*NUMBER_OF_WHEELS, exoter_kinematics::ExoterKinematicKDL::MODEL_DOF> JKdl;
 
     JKdl = exoterKDL.jacobianSolver(joints);
 

@@ -1,6 +1,6 @@
 #include "ExoterLocomotionKinematics.hpp"
 
-using namespace exoter;
+using namespace exoter_kinematics;
 
 ExoterLocomotionKinematics::ExoterLocomotionKinematics(const double wheel_radius, const unsigned int mode) : mode(mode), wheel_radius(wheel_radius)
 {

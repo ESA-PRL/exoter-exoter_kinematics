@@ -8,7 +8,7 @@
 #ifndef EXOTER_WHEELWALKING_TYPES_HPP
 #define EXOTER_WHEELWALKING_TYPES_HPP
 
-namespace exoter
+namespace exoter_kinematics
 {
     enum WheelwalkingMode {AXLE_BY_AXLE, SIDE_BY_SIDE, EVEN_ODD, SINGLE_WHEEL, NORMAL_DRIVING};
     enum WheelwalkingState {FIRST_AXLE = 0, SECOND_AXLE = 1, THIRD_AXLE = 2,

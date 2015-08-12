@@ -4,7 +4,7 @@
 
 #include <iostream>
 
-using namespace exoter;
+using namespace exoter_kinematics;
 
 ExoterWheelwalkingKinematics::ExoterWheelwalkingKinematics(const unsigned int mode, const double wheel_radius) : ExoterLocomotionKinematics(wheel_radius, mode), step_length(0.02d), offset_speed(0.0d), state(0)
 {

@@ -8,7 +8,7 @@
 #ifndef EXOTER_EGRESS_TYPES_HPP
 #define EXOTER_EGRESS_TYPES_HPP
 
-namespace exoter
+namespace exoter_kinematics
 {
     enum EgressMode {STOWED, NOMINAL, LOWER_COG_FW, LOWER_COG_BW, STEP_DOWN_FW, STEP_DOWN_BW};
 }

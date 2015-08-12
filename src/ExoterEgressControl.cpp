@@ -3,7 +3,7 @@
 #include "ExoterEgressKinematics.hpp"
 #include <iostream>
 
-using namespace exoter;
+using namespace exoter_kinematics;
 
 ExoterEgressControl::ExoterEgressControl(const double wheel_radius) : ExoterLocomotionControl(static_cast<unsigned int>(NOMINAL))
 {

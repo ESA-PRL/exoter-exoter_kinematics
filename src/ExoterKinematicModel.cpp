@@ -1,5 +1,5 @@
 #include "ExoterKinematicModel.hpp"
-#include <exoter/Configuration.hpp>
+#include <exoter_kinematics/Configuration.hpp>
 #include <iostream>
 #ifndef D2R
 #define D2R M_PI/180.00 /** Convert degree to radian **/
@@ -10,7 +10,7 @@
 
 #define DEBUG_PRINTS 1
 
-using namespace exoter;
+using namespace exoter_kinematics;
 double r; 
 
 //============================================================================================================================
@@ -181,7 +181,7 @@ void ExoterKinematicModel::fkSolver(const std::vector<double> &positions, std::v
 
 Eigen::Matrix<double, 6*NUMBER_OF_WHEELS, ExoterKinematicModel::MODEL_DOF> ExoterKinematicModel::jacobianSolver(const std::vector<double> &positions)
 {
-    Eigen::Matrix<double, 6*exoter::NUMBER_OF_WHEELS, ExoterKinematicModel::MODEL_DOF> Jacobian;
+    Eigen::Matrix<double, 6*exoter_kinematics::NUMBER_OF_WHEELS, ExoterKinematicModel::MODEL_DOF> Jacobian;
 	Jacobian.setZero();
 	
     double passive_angle;

@@ -2,7 +2,7 @@
 
 #include "ExoterEgressTypes.hpp"
 
-using namespace exoter;
+using namespace exoter_kinematics;
 
 ExoterEgressKinematics::ExoterEgressKinematics(const double wheel_radius, const unsigned int mode) : ExoterLocomotionKinematics(wheel_radius, mode), height_offset(0.0d)
 {

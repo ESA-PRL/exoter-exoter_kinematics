@@ -1,3 +1,3 @@
 rock_testsuite(KinematicTest KinematicTest.cpp
-    DEPS exoter)
+    DEPS exoter_kinematics)
 

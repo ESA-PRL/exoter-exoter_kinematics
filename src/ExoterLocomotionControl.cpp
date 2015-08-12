@@ -1,7 +1,7 @@
 #include "ExoterLocomotionControl.hpp"
 #include <iostream>
 
-using namespace exoter;
+using namespace exoter_kinematics;
 
 ExoterLocomotionControl::ExoterLocomotionControl(unsigned int mode) : current_mode(mode), mode_transition(true), stop_motion(false), speed(0.0d)
 {
