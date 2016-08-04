@@ -33,7 +33,7 @@ ExoterKinematicKDL::ExoterKinematicKDL (std::string &urdf_file, const double whe
     /** Size propertly the jacobian matrices. One per wheel/One foot per wheel **/
     wheelJacobian.resize(number_wheels);
 
-    boost::shared_ptr<urdf::ModelInterface> robot = urdf::parseURDF(xml_string);
+    std::shared_ptr<urdf::ModelInterface> robot = urdf::parseURDF(xml_string);
     if (!robot)
     {
         throw std::runtime_error("[EXOTER_KDL_MODEL] Constructor could not parse URDF model\n");
@@ -46,7 +46,7 @@ ExoterKinematicKDL::ExoterKinematicKDL (std::string &urdf_file, const double whe
     LOG_INFO("[EXOTER_KDL_MODEL] Robot has %d number of Trees\n",this->number_wheels);
 
     /* get root link*/
-    boost::shared_ptr<const urdf::Link> root_link = robot->getRoot();
+    std::shared_ptr<const urdf::Link> root_link = robot->getRoot();
     if (!root_link)
         throw std::runtime_error("[EXOTER_KDL_MODEL] Constructor could not find Root link\n");
 
