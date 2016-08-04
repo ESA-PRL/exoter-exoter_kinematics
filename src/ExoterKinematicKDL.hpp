@@ -15,11 +15,11 @@
 #define EXOTER_KINEMATIC_KDL_HPP
 
 /** Library logger **/
-#include<base/Logging.hpp>
+#include<base-logging/Logging.hpp>
 
 /* Base includes */
-#include <base/time.h>
-#include <base/eigen.h>
+#include <base/Time.hpp>
+#include <base/Eigen.hpp>
 #include <Eigen/Core>
 #include <sstream>
 #include <string> /** This should be already in sstream **/

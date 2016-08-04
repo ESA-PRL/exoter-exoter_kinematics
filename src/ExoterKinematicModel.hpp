@@ -12,8 +12,8 @@
 #define EXOTER_KINEMATIC_MODEL_HPP
 
 /* Base includes */
-#include <base/time.h>
-#include <base/eigen.h>
+#include <base/Time.hpp>
+#include <base/Eigen.hpp>
 #include <Eigen/Core>
 #include <sstream>
 #include <string> /** This should be already in sstream **/
