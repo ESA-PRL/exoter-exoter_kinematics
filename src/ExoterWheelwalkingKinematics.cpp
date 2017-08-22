@@ -197,6 +197,7 @@ void ExoterWheelwalkingKinematics::computeMovementJointCommands(const double ww_
 
             if (walking_joints_status[active_wheels[i] - ROLLING_OFFSET])
             {
+ 		//std::cout << "Position Active Wheel " << i << " : " << positions[active_wheels[i]] << std::endl;
                 step_sum += positions[active_wheels[i]];
             }
             else
@@ -206,8 +207,10 @@ void ExoterWheelwalkingKinematics::computeMovementJointCommands(const double ww_
         }
 
         step_distance += wheel_radius * step_sum / num_active_walking_wheels;
-
-//        std::cout << "Step distance: " << step_distance << std::endl;
+        
+        //std::cout << "Active walking Wheels: " << num_active_walking_wheels << std::endl;
+        //std::cout << "Step_Sum: " << step_sum << std::endl;
+        //std::cout << "Step distance: " << step_distance << std::endl;
     }
 
     if ((ww_speed > 0 && step_distance >= step_length) || (ww_speed < 0 && step_distance <= 0))
@@ -336,6 +339,7 @@ void ExoterWheelwalkingKinematics::initMode()
         this->step_distance = 0;
         break;
     case SIDE_BY_SIDE:
+        this->step_distance = this->step_length / 2;
     case EVEN_ODD:
         this->step_distance = this->step_length / 2;
     }
