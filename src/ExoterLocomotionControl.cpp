@@ -67,7 +67,6 @@ void ExoterLocomotionControl::stopMotion()
 
 void ExoterLocomotionControl::startMotion()
 {
-	kinematics->initMode();
         stop_motion = false;
 }
 
