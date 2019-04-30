@@ -67,7 +67,7 @@ void ExoterLocomotionControl::stopMotion()
 
 void ExoterLocomotionControl::startMotion()
 {
-        stop_motion = false;
+    stop_motion = false;
 }
 
 void ExoterLocomotionControl::initJointConfiguration()

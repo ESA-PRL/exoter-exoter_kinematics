@@ -74,14 +74,14 @@ void ExoterKinematicModel::fkBody2ContactPointt(const int chainIdx, const std::v
 		case ML:
 		case MR:
             passive_angle = -positions[PASSIVE];
-			trans_BC(0) = cos(passive_angle) * (chainIdx == FL || chainIdx == FR ? 1 : -1) * FRONT_PASSIVE_TO_VIRTUAL + cos(walking_angle) * cos(steering_angle) * sin(contact_angle) * this->wheelRadius + sin(walking_angle) * cos(contact_angle) * this->wheelRadius + sin(walking_angle) * LEG_LENGTH + FRONT_PASSIVE_TO_VIRTUAL;
+			trans_BC(0) = cos(passive_angle) * (chainIdx == FL || chainIdx == FR ? 1 : -1) * FRONT_PASSIVE_TO_VIRTUAL + cos(walking_angle) * cos(steering_angle) * sin(contact_angle) * this->wheelRadius + sin(walking_angle) * cos(contact_angle) * this->wheelRadius + sin(walking_angle) * LEG_LENGTH + BODY_TO_FRONT;
 			trans_BC(1) = -sin(steering_angle) * sin(contact_angle) * this->wheelRadius + (chainIdx == FL || chainIdx == ML ? 1 : -1) * CENTERLINE_TO_STEERING;
 			trans_BC(2) = sin(walking_angle) * cos(steering_angle) * sin(contact_angle) * this->wheelRadius - cos(walking_angle) * cos(contact_angle) * this->wheelRadius - cos(walking_angle) * LEG_LENGTH - VIRTUAL_TO_WALKING + sin(passive_angle) * (chainIdx == FL || chainIdx == FR ? 1 : -1) * FRONT_PASSIVE_TO_VIRTUAL;
 			break;
 		case RL:
 		case RR:
             passive_angle = positions[PASSIVE];
-            trans_BC(0) = cos(walking_angle) * cos(steering_angle) * sin(contact_angle) * this->wheelRadius + sin(walking_angle) * cos(contact_angle) * this->wheelRadius + sin(walking_angle) * LEG_LENGTH - WALKING_AXES_DISTANCE;
+            trans_BC(0) = cos(walking_angle) * cos(steering_angle) * sin(contact_angle) * this->wheelRadius + sin(walking_angle) * cos(contact_angle) * this->wheelRadius + sin(walking_angle) * LEG_LENGTH - BODY_TO_REAR;
 			trans_BC(1) = cos(passive_angle) * (chainIdx == RL ? 1 : -1) * REAR_PASSIVE_TO_VIRTUAL - sin(steering_angle) * sin(contact_angle) * this->wheelRadius + (chainIdx == RL ? 1 : -1) * REAR_VIRTUAL_TO_STEERING;
 			trans_BC(2) = sin(walking_angle) * cos(steering_angle) * sin(contact_angle) * this->wheelRadius - cos(walking_angle) * cos(contact_angle) * this->wheelRadius - cos(walking_angle) * LEG_LENGTH - VIRTUAL_TO_WALKING + sin(passive_angle) * (chainIdx == RL ? 1 : -1) * REAR_PASSIVE_TO_VIRTUAL;
 			break;
@@ -141,18 +141,15 @@ void ExoterKinematicModel::fkSolver(const std::vector<double> &positions, std::v
 			{
 				case FL:
 				case FR:
-					chainpositions[PASSIVE] = positions[i%2];															// passive				
-					chainpositions[STEERING] = positions[NUMBER_OF_PASSIVE_JOINTS + NUMBER_OF_WALKING_WHEELS + i];		// steering
-					break;
 				case ML:
 				case MR:
-					chainpositions[PASSIVE] = positions[i%2];															// passive
-					chainpositions[STEERING] = 0.0d;																	// steering
+					chainpositions[PASSIVE] = positions[i%2];															// passive				
+					chainpositions[STEERING] = positions[NUMBER_OF_PASSIVE_JOINTS + NUMBER_OF_WALKING_WHEELS + i];		// steering
 					break;
 				case RL:
 				case RR:
 					chainpositions[PASSIVE] = positions[2];																// passive
-					chainpositions[STEERING] = positions[NUMBER_OF_PASSIVE_JOINTS + NUMBER_OF_WALKING_WHEELS - 2 + i];	// steering
+					chainpositions[STEERING] = positions[NUMBER_OF_PASSIVE_JOINTS + NUMBER_OF_WALKING_WHEELS + i];  	// steering
 					break;
 			}
 			
@@ -225,18 +222,18 @@ Eigen::Matrix<double, 6*NUMBER_OF_WHEELS, ExoterKinematicModel::MODEL_DOF> Exote
 		{
 			case FL:
 			case FR:
-				steering_index = NUMBER_OF_PASSIVE_JOINTS + NUMBER_OF_WALKING_WHEELS + i;
-                steering_angle = -positions[steering_index];
 			case ML:
 			case MR:
 				passive_index = i%2;
 				passive_angle = -positions[passive_index];
+				steering_index = NUMBER_OF_PASSIVE_JOINTS + NUMBER_OF_WALKING_WHEELS + i;
+                steering_angle = -positions[steering_index];
 				break;
 			case RL:
 			case RR:
 				passive_index = 2;
 				passive_angle = positions[passive_index];
-				steering_index = NUMBER_OF_PASSIVE_JOINTS + NUMBER_OF_WALKING_WHEELS - 2 + i;
+				steering_index = NUMBER_OF_PASSIVE_JOINTS + NUMBER_OF_WALKING_WHEELS + i;
                 steering_angle = -positions[steering_index];
 				break;
 		}
@@ -257,12 +254,12 @@ Eigen::Matrix<double, 6*NUMBER_OF_WHEELS, ExoterKinematicModel::MODEL_DOF> Exote
 		switch (i)
 		{
 			case FL:
-			case FR:     
-                Jacobian(i*6+X_DOT,steering_index) = -(cos(walking_angle) * (i == FL ? 1 : -1) * CENTERLINE_TO_STEERING);
-                Jacobian(i*6+Y_DOT,steering_index) = -(sin(walking_angle) * (VIRTUAL_TO_WALKING - sin(passive_angle) * FRONT_PASSIVE_TO_VIRTUAL) - cos(walking_angle) * (cos(passive_angle) * FRONT_PASSIVE_TO_VIRTUAL + BODY_TO_FRONT));
-                Jacobian(i*6+Z_DOT,steering_index) = -(sin(walking_angle) * (i == FL ? 1 : -1) * CENTERLINE_TO_STEERING);
+			case FR:
 			case ML:
 			case MR:
+                Jacobian(i*6+X_DOT,steering_index) = -(cos(walking_angle) * (i == FL || i == ML ? 1 : -1) * CENTERLINE_TO_STEERING);
+                Jacobian(i*6+Y_DOT,steering_index) = -(sin(walking_angle) * (i == FL || i == FR ? 1 : -1) * (VIRTUAL_TO_WALKING - sin(passive_angle) * FRONT_PASSIVE_TO_VIRTUAL) - cos(walking_angle) * (cos(passive_angle) * (i == FL || i == FR ? 1 : -1) * FRONT_PASSIVE_TO_VIRTUAL + BODY_TO_FRONT));
+                Jacobian(i*6+Z_DOT,steering_index) = -(sin(walking_angle) * (i == FL || i == ML ? 1 : -1) * CENTERLINE_TO_STEERING);
                 Jacobian(i*6+X_DOT,passive_index) = -(sin(passive_angle) * (i == FL || i == FR ? 1 : -1) * FRONT_PASSIVE_TO_VIRTUAL);
                 Jacobian(i*6+X_DOT,walking_index) = -(VIRTUAL_TO_WALKING - sin(passive_angle) * (i == FL || i == FR ? 1 : -1) * FRONT_PASSIVE_TO_VIRTUAL);
                 Jacobian(i*6+X_DOT,rolling_index) = this->wheelRadius * (cos(walking_angle) * cos(steering_angle) * cos(contact_angle) - sin(walking_angle) * sin(contact_angle));
@@ -314,22 +311,13 @@ Eigen::Matrix<double, 6*NUMBER_OF_WHEELS, ExoterKinematicModel::MODEL_DOF> Exote
 				break;
 		}
 		
-		switch (i)
-		{
-			case FL:
-			case FR:
-			case RL:
-			case RR:
-                Jacobian(i*6+PHI_X_DOT,steering_index) = sin(walking_angle);
-                Jacobian(i*6+PHI_Z_DOT,steering_index) = -cos(walking_angle);
-			case ML:
-			case MR:
-                Jacobian(i*6+PHI_X_DOT,contact_index) = -(sin(steering_angle) * cos(walking_angle));
-                Jacobian(i*6+PHI_Y_DOT,walking_index) = -1;
-                Jacobian(i*6+PHI_Y_DOT,contact_index) = -(cos(steering_angle));
-                Jacobian(i*6+PHI_Z_DOT,contact_index) = -(sin(steering_angle) * sin(walking_angle));
-				break;
-		}
+        Jacobian(i*6+PHI_X_DOT,steering_index) = sin(walking_angle);
+        Jacobian(i*6+PHI_Z_DOT,steering_index) = -cos(walking_angle);
+        Jacobian(i*6+PHI_X_DOT,contact_index) = -(sin(steering_angle) * cos(walking_angle));
+        Jacobian(i*6+PHI_Y_DOT,walking_index) = -1;
+        Jacobian(i*6+PHI_Y_DOT,contact_index) = -(cos(steering_angle));
+        Jacobian(i*6+PHI_Z_DOT,contact_index) = -(sin(steering_angle) * sin(walking_angle));
+
 	}
 
     return Jacobian;

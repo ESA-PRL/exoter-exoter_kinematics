@@ -310,6 +310,7 @@ void ExoterWheelwalkingKinematics::computeMovementJointCommands(const double ww_
     velocity_commands.push_back(joint_rates.find(WALKING_RL)->second); velocity_commands.push_back(joint_rates.find(WALKING_RR)->second);
 
     velocity_commands.push_back(joint_rates.find(STEERING_FL)->second); velocity_commands.push_back(joint_rates.find(STEERING_FR)->second);
+    velocity_commands.push_back(joint_rates.find(STEERING_ML)->second); velocity_commands.push_back(joint_rates.find(STEERING_MR)->second);
     velocity_commands.push_back(joint_rates.find(STEERING_RL)->second); velocity_commands.push_back(joint_rates.find(STEERING_RR)->second);
 
     velocity_commands.push_back(joint_rates.find(ROLLING_FL)->second + joint_rates.find(CONTACT_FL)->second); velocity_commands.push_back(joint_rates.find(ROLLING_FR)->second + joint_rates.find(CONTACT_FR)->second);
