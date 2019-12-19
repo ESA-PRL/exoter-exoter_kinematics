@@ -35,8 +35,10 @@ namespace exoter_kinematics
     private:
         double step_length;
         double offset_speed;
+        bool init_mode;
         unsigned int state;
         double step_distance;
+        std::vector<double> positions_old;
     };
 }
 

@@ -129,12 +129,12 @@ void ExoterEgressKinematics::computeMovementJointCommands(const double speed, co
 
         std::map<int,double> known_joint_rates;
 
-        known_joint_rates.insert(std::pair<int,double>(ROLL_SLIP_FL, 0.0d)); known_joint_rates.insert(std::pair<int,double>(SIDE_SLIP_FL, 0.0d)); known_joint_rates.insert(std::pair<int,double>(TURN_SLIP_FL, 0.0d));
-        known_joint_rates.insert(std::pair<int,double>(ROLL_SLIP_FR, 0.0d)); known_joint_rates.insert(std::pair<int,double>(SIDE_SLIP_FR, 0.0d)); known_joint_rates.insert(std::pair<int,double>(TURN_SLIP_FR, 0.0d));
-        known_joint_rates.insert(std::pair<int,double>(ROLL_SLIP_ML, 0.0d)); known_joint_rates.insert(std::pair<int,double>(SIDE_SLIP_ML, 0.0d)); known_joint_rates.insert(std::pair<int,double>(TURN_SLIP_ML, 0.0d));
-        known_joint_rates.insert(std::pair<int,double>(ROLL_SLIP_MR, 0.0d)); known_joint_rates.insert(std::pair<int,double>(SIDE_SLIP_MR, 0.0d)); known_joint_rates.insert(std::pair<int,double>(TURN_SLIP_MR, 0.0d));
-        known_joint_rates.insert(std::pair<int,double>(ROLL_SLIP_RL, 0.0d)); known_joint_rates.insert(std::pair<int,double>(SIDE_SLIP_RL, 0.0d)); known_joint_rates.insert(std::pair<int,double>(TURN_SLIP_RL, 0.0d));
-        known_joint_rates.insert(std::pair<int,double>(ROLL_SLIP_RR, 0.0d)); known_joint_rates.insert(std::pair<int,double>(SIDE_SLIP_RR, 0.0d)); known_joint_rates.insert(std::pair<int,double>(TURN_SLIP_RR, 0.0d));
+        known_joint_rates.insert(std::pair<int,double>(LONG_SLIP_FL, 0.0d)); known_joint_rates.insert(std::pair<int,double>(LAT_SLIP_FL, 0.0d)); known_joint_rates.insert(std::pair<int,double>(YAW_SLIP_FL, 0.0d));
+        known_joint_rates.insert(std::pair<int,double>(LONG_SLIP_FR, 0.0d)); known_joint_rates.insert(std::pair<int,double>(LAT_SLIP_FR, 0.0d)); known_joint_rates.insert(std::pair<int,double>(YAW_SLIP_FR, 0.0d));
+        known_joint_rates.insert(std::pair<int,double>(LONG_SLIP_ML, 0.0d)); known_joint_rates.insert(std::pair<int,double>(LAT_SLIP_ML, 0.0d)); known_joint_rates.insert(std::pair<int,double>(YAW_SLIP_ML, 0.0d));
+        known_joint_rates.insert(std::pair<int,double>(LONG_SLIP_MR, 0.0d)); known_joint_rates.insert(std::pair<int,double>(LAT_SLIP_MR, 0.0d)); known_joint_rates.insert(std::pair<int,double>(YAW_SLIP_MR, 0.0d));
+        known_joint_rates.insert(std::pair<int,double>(LONG_SLIP_RL, 0.0d)); known_joint_rates.insert(std::pair<int,double>(LAT_SLIP_RL, 0.0d)); known_joint_rates.insert(std::pair<int,double>(YAW_SLIP_RL, 0.0d));
+        known_joint_rates.insert(std::pair<int,double>(LONG_SLIP_RR, 0.0d)); known_joint_rates.insert(std::pair<int,double>(LAT_SLIP_RR, 0.0d)); known_joint_rates.insert(std::pair<int,double>(YAW_SLIP_RR, 0.0d));
 
         if (mode == STEP_DOWN_FW)
         {

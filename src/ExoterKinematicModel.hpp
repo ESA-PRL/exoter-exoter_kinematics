@@ -29,7 +29,7 @@
 namespace exoter_kinematics
 {
 
-    class ExoterKinematicModel : public ::odometry::KinematicModel<double, NUMBER_OF_WHEELS, EXOTER_JOINT_DOF, SLIP_VECTOR_SIZE, CONTACT_POINT_DOF>
+    class ExoterKinematicModel : public ::odometry::KinematicModel<double, NUMBER_OF_WHEELS, EXOTER_JOINT_DOF + 6, SLIP_VECTOR_SIZE, CONTACT_POINT_DOF>
     {
     public:
         EIGEN_MAKE_ALIGNED_OPERATOR_NEW
@@ -56,9 +56,8 @@ namespace exoter_kinematics
                           std::map<int,double> &body_rates, std::map<int,double> &joint_rates);
     private:
         void rearrangeKinematicMatrices(const std::map<int,double> &known_body_rates, const std::map<int,double> &known_joint_rates,
-                                        const Eigen::Matrix<double, 6 * NUMBER_OF_WHEELS, 6> &E, const Eigen::Matrix<double, 6 * NUMBER_OF_WHEELS, MODEL_DOF> &J,
+                                        const Eigen::Matrix<double, 6 * NUMBER_OF_WHEELS, MODEL_DOF> &J,
                                         Eigen::Matrix<double, 6 * NUMBER_OF_WHEELS, Eigen::Dynamic> &A, Eigen::Matrix<double, 6 * NUMBER_OF_WHEELS, Eigen::Dynamic> &B);
-        void removeMatrixColumns(Eigen::Matrix<double, 6 * NUMBER_OF_WHEELS, Eigen::Dynamic> &matrix, const std::map<int,double> columns_to_remove);
     };
 };
 

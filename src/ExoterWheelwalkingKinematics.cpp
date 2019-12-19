@@ -3,11 +3,13 @@
 #include "ExoterWheelwalkingTypes.hpp"
 
 #include <iostream>
+#include <set>
 
 using namespace exoter_kinematics;
 
-ExoterWheelwalkingKinematics::ExoterWheelwalkingKinematics(const unsigned int mode, const double wheel_radius) : ExoterLocomotionKinematics(wheel_radius, mode), step_length(0.02d), offset_speed(0.0d), state(0)
+ExoterWheelwalkingKinematics::ExoterWheelwalkingKinematics(const unsigned int mode, const double wheel_radius) : ExoterLocomotionKinematics(wheel_radius, mode), step_length(0.02d), offset_speed(0.0d), init_mode(true), state(0)
 {
+    this->positions_old.assign(EXOTER_JOINT_DOF + NUMBER_OF_WHEELS, 0.0d);
 }
 
 ExoterWheelwalkingKinematics::~ExoterWheelwalkingKinematics()
@@ -50,25 +52,49 @@ void ExoterWheelwalkingKinematics::computeMovementJointCommands(const double ww_
                                                                 const std::vector<double>& positions, const std::vector<double>& velocities,
                                                                 std::vector<double>& position_commands, std::vector<double>& velocity_commands)
 {
+    if (init_mode)
+    {
+        positions_old = positions;
+        init_mode = false;
+    }
+
     std::map<int,double> known_body_rates;
 
     known_body_rates.insert(std::pair<int,double>(X_DOT, ww_speed + offset_speed));
     known_body_rates.insert(std::pair<int,double>(Y_DOT, 0.0d));
-
-    known_body_rates.insert(std::pair<int,double>(PHI_X_DOT, 0.0d));
-    known_body_rates.insert(std::pair<int,double>(PHI_Y_DOT, 0.0d)); 
     known_body_rates.insert(std::pair<int,double>(PHI_Z_DOT, 0.0d));
 
     std::map<int,double> known_joint_rates;
 
-    known_joint_rates.insert(std::pair<int,double>(ROLL_SLIP_FL, 0.0d)); known_joint_rates.insert(std::pair<int,double>(SIDE_SLIP_FL, 0.0d)); known_joint_rates.insert(std::pair<int,double>(TURN_SLIP_FL, 0.0d));
-    known_joint_rates.insert(std::pair<int,double>(ROLL_SLIP_FR, 0.0d)); known_joint_rates.insert(std::pair<int,double>(SIDE_SLIP_FR, 0.0d)); known_joint_rates.insert(std::pair<int,double>(TURN_SLIP_FR, 0.0d));
-    known_joint_rates.insert(std::pair<int,double>(ROLL_SLIP_ML, 0.0d)); known_joint_rates.insert(std::pair<int,double>(SIDE_SLIP_ML, 0.0d)); known_joint_rates.insert(std::pair<int,double>(TURN_SLIP_ML, 0.0d));
-    known_joint_rates.insert(std::pair<int,double>(ROLL_SLIP_MR, 0.0d)); known_joint_rates.insert(std::pair<int,double>(SIDE_SLIP_MR, 0.0d)); known_joint_rates.insert(std::pair<int,double>(TURN_SLIP_MR, 0.0d));
-    known_joint_rates.insert(std::pair<int,double>(ROLL_SLIP_RL, 0.0d)); known_joint_rates.insert(std::pair<int,double>(SIDE_SLIP_RL, 0.0d)); known_joint_rates.insert(std::pair<int,double>(TURN_SLIP_RL, 0.0d));
-    known_joint_rates.insert(std::pair<int,double>(ROLL_SLIP_RR, 0.0d)); known_joint_rates.insert(std::pair<int,double>(SIDE_SLIP_RR, 0.0d)); known_joint_rates.insert(std::pair<int,double>(TURN_SLIP_RR, 0.0d));
+    known_joint_rates.insert(std::pair<int,double>(STEERING_FL, 0.0d));
+    known_joint_rates.insert(std::pair<int,double>(STEERING_FR, 0.0d));
+    known_joint_rates.insert(std::pair<int,double>(STEERING_ML, 0.0d));
+    known_joint_rates.insert(std::pair<int,double>(STEERING_MR, 0.0d));
+    known_joint_rates.insert(std::pair<int,double>(STEERING_RL, 0.0d));
+    known_joint_rates.insert(std::pair<int,double>(STEERING_RR, 0.0d));
 
-    std::vector<int> active_wheels;
+    known_joint_rates.insert(std::pair<int,double>(LONG_SLIP_FL, 0.0d));
+    known_joint_rates.insert(std::pair<int,double>(LONG_SLIP_FR, 0.0d));
+    known_joint_rates.insert(std::pair<int,double>(LONG_SLIP_ML, 0.0d));
+    known_joint_rates.insert(std::pair<int,double>(LONG_SLIP_MR, 0.0d));
+    known_joint_rates.insert(std::pair<int,double>(LONG_SLIP_RL, 0.0d));
+    known_joint_rates.insert(std::pair<int,double>(LONG_SLIP_RR, 0.0d));
+
+    known_joint_rates.insert(std::pair<int,double>(PERP_SLIP_FL, 0.0d));
+    known_joint_rates.insert(std::pair<int,double>(PERP_SLIP_FR, 0.0d));
+    known_joint_rates.insert(std::pair<int,double>(PERP_SLIP_ML, 0.0d));
+    known_joint_rates.insert(std::pair<int,double>(PERP_SLIP_MR, 0.0d));
+    known_joint_rates.insert(std::pair<int,double>(PERP_SLIP_RL, 0.0d));
+    known_joint_rates.insert(std::pair<int,double>(PERP_SLIP_RR, 0.0d));
+
+    known_joint_rates.insert(std::pair<int,double>(PITCH_SLIP_FL, 0.0d));
+    known_joint_rates.insert(std::pair<int,double>(PITCH_SLIP_FR, 0.0d));
+    known_joint_rates.insert(std::pair<int,double>(PITCH_SLIP_ML, 0.0d));
+    known_joint_rates.insert(std::pair<int,double>(PITCH_SLIP_MR, 0.0d));
+    known_joint_rates.insert(std::pair<int,double>(PITCH_SLIP_RL, 0.0d));
+    known_joint_rates.insert(std::pair<int,double>(PITCH_SLIP_RR, 0.0d));
+
+    std::set<int> active_wheels;
 
     unsigned int num_phases = 0;
     unsigned int num_active_wheels=0;
@@ -82,16 +108,16 @@ void ExoterWheelwalkingKinematics::computeMovementJointCommands(const double ww_
         switch (state)
         {
             case FIRST_AXLE:
-                active_wheels.push_back(ROLLING_FL);
-                active_wheels.push_back(ROLLING_FR);
+                active_wheels.insert(ROLLING_FL);
+                active_wheels.insert(ROLLING_FR);
                 break;
             case SECOND_AXLE:
-                active_wheels.push_back(ROLLING_ML);
-                active_wheels.push_back(ROLLING_MR);
+                active_wheels.insert(ROLLING_ML);
+                active_wheels.insert(ROLLING_MR);
                 break;
             case THIRD_AXLE:
-                active_wheels.push_back(ROLLING_RL);
-                active_wheels.push_back(ROLLING_RR);
+                active_wheels.insert(ROLLING_RL);
+                active_wheels.insert(ROLLING_RR);
                 break;
         }
 
@@ -103,14 +129,14 @@ void ExoterWheelwalkingKinematics::computeMovementJointCommands(const double ww_
         switch (state)
         {
             case LEFT_SIDE:
-                active_wheels.push_back(ROLLING_FL);
-                active_wheels.push_back(ROLLING_ML);
-                active_wheels.push_back(ROLLING_RL); 
+                active_wheels.insert(ROLLING_FL);
+                active_wheels.insert(ROLLING_ML);
+                active_wheels.insert(ROLLING_RL);
                 break;
             case RIGHT_SIDE:
-                active_wheels.push_back(ROLLING_FR);
-                active_wheels.push_back(ROLLING_MR);
-                active_wheels.push_back(ROLLING_RR); 
+                active_wheels.insert(ROLLING_FR);
+                active_wheels.insert(ROLLING_MR);
+                active_wheels.insert(ROLLING_RR);
                 break;
         }
 
@@ -122,14 +148,14 @@ void ExoterWheelwalkingKinematics::computeMovementJointCommands(const double ww_
         switch (state)
         {
             case EVEN:
-                active_wheels.push_back(ROLLING_FL);
-                active_wheels.push_back(ROLLING_MR);
-                active_wheels.push_back(ROLLING_RL); 
+                active_wheels.insert(ROLLING_FL);
+                active_wheels.insert(ROLLING_MR);
+                active_wheels.insert(ROLLING_RL);
                 break;
             case ODD:
-                active_wheels.push_back(ROLLING_FR);
-                active_wheels.push_back(ROLLING_ML);
-                active_wheels.push_back(ROLLING_RR);
+                active_wheels.insert(ROLLING_FR);
+                active_wheels.insert(ROLLING_ML);
+                active_wheels.insert(ROLLING_RR);
                 break;
         }
 
@@ -141,22 +167,22 @@ void ExoterWheelwalkingKinematics::computeMovementJointCommands(const double ww_
         switch (state)
         {
             case FRONT_LEFT:
-                active_wheels.push_back(ROLLING_FL);    
+                active_wheels.insert(ROLLING_FL);
                 break;
             case FRONT_RIGHT:
-                active_wheels.push_back(ROLLING_FR);
+                active_wheels.insert(ROLLING_FR);
                 break;
             case MIDDLE_LEFT:
-                active_wheels.push_back(ROLLING_ML);
+                active_wheels.insert(ROLLING_ML);
                 break;
             case MIDDLE_RIGHT:
-                active_wheels.push_back(ROLLING_MR);
+                active_wheels.insert(ROLLING_MR);
                 break;
             case REAR_LEFT:
-                active_wheels.push_back(ROLLING_RL);
+                active_wheels.insert(ROLLING_RL);
                 break;
             case REAR_RIGHT:
-                active_wheels.push_back(ROLLING_RR);
+                active_wheels.insert(ROLLING_RR);
                 break;
         }
 
@@ -165,53 +191,53 @@ void ExoterWheelwalkingKinematics::computeMovementJointCommands(const double ww_
         num_phases = 1;
         num_active_wheels = 6;
 
-        active_wheels.push_back(ROLLING_FL);    
-        active_wheels.push_back(ROLLING_FR);
-        active_wheels.push_back(ROLLING_ML);
-        active_wheels.push_back(ROLLING_MR);
-        active_wheels.push_back(ROLLING_RL);
-        active_wheels.push_back(ROLLING_RR);
+        active_wheels.insert(ROLLING_FL);
+        active_wheels.insert(ROLLING_FR);
+        active_wheels.insert(ROLLING_ML);
+        active_wheels.insert(ROLLING_MR);
+        active_wheels.insert(ROLLING_RL);
+        active_wheels.insert(ROLLING_RR);
 
         break;
     }
 
-    const int ROLLING_OFFSET = NUMBER_OF_PASSIVE_JOINTS + NUMBER_OF_WALKING_WHEELS + NUMBER_OF_STEERABLE_WHEELS;
+    const int ROLLING_OFFSET = NUMBER_OF_PASSIVE_JOINTS + NUMBER_OF_WALKING_WHEELS + NUMBER_OF_STEERABLE_WHEELS + NUMBER_OF_WHEELS;
+    const int LONG_SLIP_OFFSET = ROLLING_OFFSET + NUMBER_OF_WHEELS;
 
     double offset_rolling_rate = offset_speed / wheel_radius;
+    double ww_rolling_rate = ww_speed / wheel_radius * num_phases;
+
+    double step_sum = 0.0d;
+    int num_active_walking_wheels = num_active_wheels;
 
     for (int i = 0; i < NUMBER_OF_WHEELS; i++)
     {
         known_joint_rates.insert(std::pair<int,double>(ROLLING_OFFSET + i, offset_rolling_rate));
-    }
 
-    if (num_active_wheels != 0)
-    {
-        double ww_rolling_rate = ww_speed / wheel_radius * num_phases;
-        double step_sum = 0.0d;
-
-        int num_active_walking_wheels = num_active_wheels;
-
-        for (unsigned int i = 0; i < num_active_wheels; i++)
+        if (active_wheels.find(ROLLING_OFFSET + i) != active_wheels.end())
         {
-            known_joint_rates[active_wheels[i]] += ww_rolling_rate;
+            known_joint_rates[ROLLING_OFFSET + i] += ww_rolling_rate;
 
-            if (walking_joints_status[active_wheels[i] - ROLLING_OFFSET])
+            if (walking_joints_status[i])
             {
- 		//std::cout << "Position Active Wheel " << i << " : " << positions[active_wheels[i]] << std::endl;
-                step_sum += positions[active_wheels[i]];
+ 		        //std::cout << "Position Active Wheel " << i << " : " << positions[active_wheels[i]] << std::endl;
+                step_sum += positions[ROLLING_OFFSET + i] - positions_old[ROLLING_OFFSET + i];
             }
             else
             {
                 num_active_walking_wheels--;
             }
         }
+    }
 
+    if (num_active_walking_wheels != 0)
+    {
         step_distance += wheel_radius * step_sum / num_active_walking_wheels;
-        
+    }
+
         //std::cout << "Active walking Wheels: " << num_active_walking_wheels << std::endl;
         //std::cout << "Step_Sum: " << step_sum << std::endl;
         //std::cout << "Step distance: " << step_distance << std::endl;
-    }
 
     if ((ww_speed > 0 && step_distance >= step_length) || (ww_speed < 0 && step_distance <= 0))
     {
@@ -226,55 +252,6 @@ void ExoterWheelwalkingKinematics::computeMovementJointCommands(const double ww_
             step_distance = step_length;
         }
     }
-
-/*
-    switch (mode)
-    {
-    case AXLE_BY_AXLE:
-        if ((ww_speed > 0 && step_distance >= step_length) || (ww_speed < 0 && step_distance <= 0))
-        {
-            if (ww_speed > 0)
-            {
-                ++state %= num_phases;
-                step_distance = 0;
-            }
-            else
-            {
-                state = (state == 0) ? num_phases - 1 : state - 1;
-                step_distance = step_length;
-            }
-        }
-
-        break;
-    case SIDE_BY_SIDE:
-    case EVEN_ODD:
-        if ((ww_speed > 0 && step_distance >= step_length / 2) || (ww_speed < 0 && step_distance <= -step_length / 2))
-        {
-            state++;
-            state %= 2;
-            step_distance = (ww_speed > 0) ? -step_length / 2 : step_length / 2;
-        }
-
-        break;
-    case SINGLE_WHEEL:
-        if ((ww_speed > 0 && step_distance >= step_length) || (ww_speed < 0 && step_distance <= 0))
-        {
-            if (ww_speed > 0)
-            {
-                ++state %= 6;
-                step_distance = 0;
-            }
-            else
-            {
-                state = (state == 0) ? 5 : state - 1;
-                step_distance = step_length;
-            }
-        }
-        break;
-    case NORMAL_DRIVING:
-        break;
-    }
-*/
 
     bool no_disabled_walking_joint = true;
 
@@ -293,7 +270,7 @@ void ExoterWheelwalkingKinematics::computeMovementJointCommands(const double ww_
     if (!no_disabled_walking_joint)
     {
         known_body_rates.erase(PHI_X_DOT);
-        known_body_rates.erase(PHI_Y_DOT); 
+        known_body_rates.erase(PHI_Y_DOT);
     }
 
     std::map<int,double> body_rates;
@@ -316,6 +293,8 @@ void ExoterWheelwalkingKinematics::computeMovementJointCommands(const double ww_
     velocity_commands.push_back(joint_rates.find(ROLLING_FL)->second + joint_rates.find(CONTACT_FL)->second); velocity_commands.push_back(joint_rates.find(ROLLING_FR)->second + joint_rates.find(CONTACT_FR)->second);
     velocity_commands.push_back(joint_rates.find(ROLLING_ML)->second + joint_rates.find(CONTACT_ML)->second); velocity_commands.push_back(joint_rates.find(ROLLING_MR)->second + joint_rates.find(CONTACT_MR)->second);
     velocity_commands.push_back(joint_rates.find(ROLLING_RL)->second + joint_rates.find(CONTACT_RL)->second); velocity_commands.push_back(joint_rates.find(ROLLING_RR)->second + joint_rates.find(CONTACT_RR)->second);
+
+    positions_old = positions;
 }
 
 std::vector<double> ExoterWheelwalkingKinematics::getConfigChangeTargetJointPositions()
@@ -330,6 +309,7 @@ std::vector<double> ExoterWheelwalkingKinematics::getConfigChangeTargetJointPosi
 
 void ExoterWheelwalkingKinematics::initMode()
 {
+    this->init_mode = true;
     this->state = 0;
 
     switch (mode)

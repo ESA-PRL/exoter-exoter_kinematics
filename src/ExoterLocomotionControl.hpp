@@ -41,8 +41,6 @@ namespace exoter_kinematics
 	std::vector<bool> walking_joints_status;
 
         bool checkTargetJointPositionsReached();
-        std::vector<double> assemblePositionVector(const std::vector<double> position_readings);
-        std::vector<double> assembleVelocityVector(const std::vector<double> velocity_readings);
     };
 }
 
